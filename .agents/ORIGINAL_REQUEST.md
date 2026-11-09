@@ -57,26 +57,28 @@ Everything below is REQUIRED, not optional, except R9 (marked experiment). Time 
 - Hybrid retrieval: BM25 + `semantic_text` (Jina via Elastic Inference Service), fused with RRF.
 - Reranker (Jina reranker through EIS) on the top candidates. VERIFY availability on the trial; fall back to RRF-only and say so in the UI and README.
 - Multilingual search: a query in Spanish (and at least one more language) finds English talks. Sessions get `lang` metadata. VERIFY the model used is multilingual.
-- Plain-language intent: "I use a wheelchair", "I'm new to this", "talks with captions" map to filters (step_free_room, level beginner, captions) through Elastic Agent Builder or an MCP tool, with the interpreted filters shown to the user and removable. VERIFY Agent Builder/MCP access.
+- Plain-language intent: "I use a wheelchair", "I'm new to this", "talks with captions" map to filters (step_free_room, level beginner, captions). Build a deterministic, explainable phrase-to-filter table in Swift FIRST (testable, in the relevance suite, no extra service to fail); Elastic Agent Builder / MCP is an enhancement on top. Interpreted filters are shown to the user and removable. VERIFY Agent Builder/MCP access before relying on it.
 - Relevance suite: `eval/queries.json` with about 40 labelled queries (English, Spanish, plain-language intent), a runner reporting MRR and nDCG@10 for keyword, semantic, hybrid and reranked, written to `eval/REPORT.md` with a chart.
-- CI relevance gate: a pull request fails if hybrid MRR drops below the committed baseline. Runs in CI against the in-memory backend and, when credentials exist, against Elasticsearch.
+- CI relevance gate: a pull request fails if MRR drops below the committed baseline. Two baselines, never mixed: (a) the in-memory stand-in backend (runs in every CI job, tests the fallback), (b) Elasticsearch (runs only when repo secrets ELASTIC_URL/ELASTIC_API_KEY exist; this is the one that tests the product). REPORT.md states which backend produced each number and that 60 sessions / ~40 queries is a small sample written by the team, so results show direction, not statistical proof.
 
 ### R11. Observability depth (Dash0 track)
-- Traces, logs and metrics from the server; span per backend call (keyword, semantic, rerank).
-- Real-user monitoring from the HTMX pages (page load, search latency as seen by the browser). VERIFY Dash0 RUM setup for a non-SPA page.
-- A real SLO on search latency, dashboards and alert rules kept as files in the repo (`deploy/dash0/`), applied with the Dash0 CLI or API. VERIFY format.
-- Synthetic monitoring of the search page.
+- Traces, logs and metrics from the server via `swift-otel` 1.0 (an OTLP backend for swift-log, swift-metrics and swift-distributed-tracing; runs inside a swift-service-lifecycle ServiceGroup; default OTLP/HTTP; honours OTEL_* env vars). Verified to exist 2026-11-09; still VERIFY it exports to Dash0 with the auth header. Span per backend call (keyword, semantic, rerank).
+- Real-user monitoring from the HTMX pages with the Dash0 Web SDK (`@dash0/sdk-web`, `init({serviceName, endpoint})`; captures page views, Core Web Vitals, HTTP requests, errors). It is an npm package: vendor the built file under Public/vendor/ (CSP allows only 'self' scripts). The browser sends to Dash0, so the CSP `connect-src` must add the Dash0 ingest origin and the token used is a browser-safe, ingest-only token (never the full auth token). VERIFY the exact endpoint and token type.
+- A real SLO on search latency, dashboards and alert rules kept as YAML in `deploy/dash0/` and applied with `dash0 apply -f deploy/dash0/ --dry-run` then for real (the CLI supports Dashboard, CheckRule, SyntheticCheck and View assets; verified in Dash0 docs 2026-11-09). Alerts are CheckRules; a SLO may need the operator or Terraform route, so VERIFY.
+- Synthetic monitoring of the search page as a SyntheticCheck YAML (`dash0 synthetic-checks create -f`).
 - Dash0 operator installed on the cluster. VERIFY install steps.
 - Dash0 MCP server connected to the coding assistant and used for the incident loop.
 
 ### R12. Platform and operations (Radar track)
 - Kubernetes manifests with liveness/readiness probes, resource requests/limits, HorizontalPodAutoscaler, PodDisruptionBudget, secrets via k8s Secret.
+- CLUSTER DECISION (human): either the event's Radar cluster (join code from the Radar table at https://join.cnh.radarhq.io; Argo CD already there) or OrbStack Kubernetes (running locally; Argo CD, Dash0 operator and Radar must be installed). Record the choice in STATE.md before S8 starts.
+- IMAGE REGISTRY (missing from earlier plan): GitHub Actions builds the Linux image and pushes it to ghcr.io (public package) tagged with the commit; manifests reference that tag. The event cluster is probably amd64 while this Mac is arm64, so CI builds linux/amd64 (and arm64 if OrbStack is used). VERIFY cluster architecture with `kubectl get nodes -o wide`.
 - Argo CD deploys from the repo (every push deploys, as the Radar starter does). Use `skyhook-io/cnh-starter` structure as reference.
 - Radar connected to the cluster (event cluster or OrbStack), Radar MCP added to the coding assistant.
 - Deliberate failure scenarios, each with a runbook in `docs/runbooks/`: slow query, crash loop (bad env), bad deploy (failing readiness), dependency outage (Elasticsearch unreachable, app falls back and says so). Each is triggerable by a documented flag or manifest and each is investigated in Radar.
 
 ### R13. Closed incident loop (cross-track centerpiece)
-Slow query in the deployed app -> Dash0 (Agent0 or MCP) identifies the slow span -> fix opened as a pull request -> Gitar reviews and diagnoses a failing CI check, auto-apply pushes the fix -> Argo CD rolls out -> Radar investigation and rollout checks show recovery -> UI ops strip returns to normal. The injected fault is labelled as injected in the README. Every step must really happen and be recorded (screenshots or a short screen recording) in `docs/demo/`.
+Slow query in the deployed app -> Dash0 (Agent0 or MCP) identifies the slow span -> fix opened as a pull request -> Gitar reviews and diagnoses a failing CI check, auto-apply pushes the fix -> Argo CD rolls out -> Radar investigation and rollout checks show recovery -> UI ops strip returns to normal. Prefer a REAL problem found by profiling our own code in Dash0 (the criterion says "something real"); only if none is found, inject one and label it as injected in the README. Never present an injected fault as an accidental one. Every step must really happen and be recorded (screenshots or a short screen recording) in `docs/demo/`.
 
 ### R14. Accessibility proof (Merge Forward)
 - WCAG 2.2 AA checklist with a recorded result for every criterion that applies, in `docs/ACCESSIBILITY.md`.
@@ -127,3 +129,17 @@ Slow query in the deployed app -> Dash0 (Agent0 or MCP) identifies the slow span
 - [ ] R13: the full loop executed once with evidence in `docs/demo/`
 - [ ] R14: `docs/ACCESSIBILITY.md` has every applicable WCAG 2.2 AA criterion marked pass/fail with evidence; JS-off, forced-colors, 200% zoom, dyslexia option and VoiceOver results recorded
 - [ ] R15: `EXPLAIN.md` answers written by the human (verified by asking the user, not by an agent)
+
+### Open verification list (check each on the real accounts before building on it)
+1. Elastic trial: Jina embeddings via EIS, reranker, `semantic_text`, RRF retriever, multilingual behaviour.
+2. `swift-otel` 1.0 -> Dash0 export with auth header.
+3. Dash0 RUM endpoint and browser-safe token; operator install; SLO route.
+4. Cluster choice and architecture; ghcr push; Argo CD; Radar attach.
+5. htmx 2 options used in DESIGN.md (`transition:true`, `includeIndicatorStyles`).
+6. BrowserOS neo tools reachable from this session and from subagents (they were NOT present in the session's tool list at 15:49; run `/mcp` to reconnect).
+7. Whether organizers accept an earlier own project as a starter template (rule 8) and how projects are submitted. Ask at the desk.
+
+### Before the first push (privacy)
+- `docs/assets/event-banner.png` had GPS coordinates (the public venue) and device model; stripped from HEAD on 2026-11-09 with `tools/strip-metadata.swift`. The original is still in local history (commit 9ae6d15); decide whether to purge history before pushing.
+- 23 tracked files, mostly `.agents/`, contain the local path `/Users/denn/...`. Absolute paths are needed while agents run. Before pushing, sanitize them (replace with `<repo>`) or stop tracking `.agents/` and keep only a disclosure summary.
+- Pick a licence (README says TBD).
