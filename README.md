@@ -38,7 +38,7 @@ Hackathon-Slc/
 │  ├─ k8s/                 manifests: probes, autoscaler, disruption budget
 │  ├─ argocd/              Argo CD application (push deploys)
 │  └─ dash0/               SLO, dashboards, alerts, synthetic checks as YAML
-├─ tests/ui/               BrowserOS Neo test plan and recorded results
+├─ tests/ui/               manual UI checklist and recorded results
 ├─ docs/
 │  ├─ event/               EVENT.md (summary), instruction.md (the site's instructions and sponsor ideas)
 │  ├─ design/              DESIGN.md (UI and motion), COPY.md (UX copy)

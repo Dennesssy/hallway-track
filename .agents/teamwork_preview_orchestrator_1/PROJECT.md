@@ -19,7 +19,7 @@ Known unverified: EIS/Jina availability on trial; must be reported UNVERIFIED, n
 | F4 | Server tests (node:test), ES integration tests SKIP w/o creds | M1 |
 | F5 | Web UI per approved spec | M2 |
 | F5b | HTMX rebuild of web UI (user 15:28): htmx 2.x vendored, server-rendered fragments /ui/results, /ui/meta, /ui/query, full-page fallback at /; replaces vanilla-JS UI 2885473; implements docs/design/DESIGN.md §2–5 | M2 (redo) + M1 change |
-| F6 | UI tests via BrowserOS neo ONLY (no Playwright, user 15:25): a11y scan, 390px, light/dark, keyboard, DESIGN.md §7 | M3 |
+| F6 | UI verification: manual checklist (tests/ui/CHECKLIST.md) + swift test on HTML fragments; no Neo, no Playwright (user) | M3 |
 | F7 | OpenTelemetry (traces/logs/metrics, OTLP env config, local exporter test) | M4 |
 | F8 | Dockerfile, .dockerignore, k8s manifests | M5 |
 | F9 | GitHub Actions CI + Gitar config (.gitar/review, .gitar/config; NO .gitar.yml) | M6 |
@@ -36,7 +36,7 @@ Gate for every milestone = full roster (Worker, 2 Reviewers, 2 Challengers, 1 Fo
 | S2 | Search engine | Elastic backend via AsyncHTTPClient (mapping, bulk index, hybrid+RRF, reranker, multilingual, intent), in-memory fallback, indexer CLI | Sources/App/Search/**, Sources/Indexer/** | S1; Elastic key (human) | `swift test`; ES tests SKIPPED without creds |
 | S3 | HTMX UI + design | DESIGN.md sections 2-5, 8, 9; COPY.md; fragments /ui/*; vendored htmx | swift-server/Public/**, Sources/App/Views/** | S1 (S2 for live data) | renders; neo smoke |
 | S4 | Accessibility build | JS-off path, forced-colors/high-contrast, 200% zoom, dyslexia option, reduced motion | Public/** (CSS/HTML only) | S3 | checklist items implemented |
-| S5 | UI tests + a11y proof | BrowserOS neo passes; docs/ACCESSIBILITY.md; Human: VoiceOver pass | tests/ui/**, docs/ACCESSIBILITY.md | S3,S4 | recorded neo results |
+| S5 | UI verification + a11y proof | tests/ui/CHECKLIST.md, docs/ACCESSIBILITY.md; Human: Safari checklist and VoiceOver pass | tests/ui/**, docs/ACCESSIBILITY.md | S3,S4 | completed checklist |
 | S6 | Relevance suite + gate | eval/queries.json, runner, REPORT.md, CI gate | eval/**, Tests/** | S2 | MRR/nDCG table; degraded ranking fails |
 | S7 | Observability | OTel traces/logs/metrics, RUM, SLO/dashboard/alerts as files, synthetic, Dash0 operator | Sources/App/Telemetry/**, deploy/dash0/** | S1; Dash0 account (human) | spans in Dash0 |
 | S8 | Container + platform | Dockerfile (no SQLite), k8s (probes, HPA, PDB), Argo CD app, Radar connect | Dockerfile, deploy/k8s/**, deploy/argocd/** | S1 | image serves /healthz; Argo Synced |
@@ -74,7 +74,7 @@ HTTP:
 - Highlight strings contain only <mark> tags; HTML-escape everything else server-side so UI may innerHTML safely (or UI re-escapes) — M1 escapes, M2 only injects highlights.
 UI a11y facts: tokens verified AA — light text #1B1F24/#FFFFFF, muted #4B5563, accent #1D4ED8, mark #FDE68A, error #B91C1C, input border #6B7280; dark text #E6EDF3/#0E1116, card #161B22, muted #A9B4C2, accent #7AB7FF, mark #F5C542, error #FF8A80, border #8B949E. Flags rendered as text "Name: yes/no" + aria-hidden icon. Skip link, role=search, fieldset "Accessibility needs", aria-live polite count, filters in <details> on 390px, 44px targets, no focus moves while typing.
 Gitar: .gitar/review/*.md + .gitar/config/*.md. Dash0 envs per list above (OTLP http). Radar: app on $PORT 8080, /healthz,/readyz. k8s: kustomize deploy/k8s, validate `kubectl apply --dry-run=client --validate=false -k deploy/k8s`.
-BrowserOS neo: MCP unreachable (installed, not running). UI worker must probe; if down write Soft handoff naming blocker; no silent fallback.
+(BrowserOS neo dropped by the user; UI verification is manual.)
 
 ## Code Layout
 server/src/{main.ts,app.ts,config.ts,validate.ts,backends/{types,memory,elastic,fusion}.ts,telemetry.ts}, server/scripts/index-sessions.ts, server/test/*.test.ts; web/{index.html,app.js,styles.css}; tests/ui/ (BrowserOS neo test plan + recorded results/screenshots; no Playwright); deploy/{Dockerfile? (root Dockerfile),k8s/*}; .github/workflows/ci.yml; .gitar/; BUILD.md README.md .env.example .dockerignore.

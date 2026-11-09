@@ -126,11 +126,11 @@ a{color:var(--accent)}
   <h2>Setup status</h2>
   <div class="grid g3">
     <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Elasticsearch</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Project "Hackathon", Iowa, version 9.7. API key works. Jina embeddings and rerankers available. Semantic search tested on a throwaway index.</p></div>
-    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Dash0</h3><p style="margin:6px 0 0;font-size:13.5px">Ingest token accepted (HTTP 200) at the us-west-2 endpoint. <b>Rotate it:</b> it was pasted into chat.</p></div>
+    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Dash0</h3><p style="margin:6px 0 0;font-size:13.5px">Ingest token accepted (HTTP 200) at the us-west-2 endpoint.</p></div>
     <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Tools</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Swift starter builds. kubectl, kubectl-radar, argocd, helm, dash0 CLI, gitleaks installed. OrbStack Kubernetes running.</p></div>
     <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Secrets</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Git history: 0 findings. Keys live only in the gitignored <code>.env</code>. Banner photo stripped of GPS.</p></div>
     <div class="panel"><span class="pill p-hi">NEEDS YOU</span><h3 style="margin-top:8px;font-size:15px">GitHub + Gitar</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Create the public repo, push once, install the Gitar app. After that, no commits to main: every feature is a PR.</p></div>
-    <div class="panel"><span class="pill p-hi">NEEDS YOU</span><h3 style="margin-top:8px;font-size:15px">Radar + cluster</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Join code from the Radar table, or choose OrbStack. Reconnect BrowserOS Neo with /mcp for UI tests.</p></div>
+    <div class="panel"><span class="pill p-hi">NEEDS YOU</span><h3 style="margin-top:8px;font-size:15px">Radar + cluster</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Join code from the Radar table, or choose OrbStack.</p></div>
   </div>
 </section>
 
@@ -197,7 +197,7 @@ a{color:var(--accent)}
         <tr><td>S1</td><td>Trim the starter, SwiftNIO core, security headers, health checks</td><td>S0</td><td><span class="pill p-md">QUEUED</span></td></tr>
         <tr><td>S2</td><td>Search: Elasticsearch hybrid, Jina rerank, multilingual, intent; in-memory fallback; indexer</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
         <tr><td>S3</td><td>HTMX UI, My agenda, Quiet route (DESIGN.md, COPY.md)</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
-        <tr><td>S4–S5</td><td>Accessibility build and proof; BrowserOS Neo tests</td><td>S3</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S4–S5</td><td>Accessibility build and proof; manual UI checklist</td><td>S3</td><td><span class="pill p-md">QUEUED</span></td></tr>
         <tr><td>S6</td><td>Relevance tests and CI gate</td><td>S2</td><td><span class="pill p-md">QUEUED</span></td></tr>
         <tr><td>S7</td><td>Telemetry: traces, logs, metrics, RUM, SLO, dashboards, alerts</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
         <tr><td>S8</td><td>Container, Kubernetes, Argo CD, autoscaler, Radar</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
@@ -251,9 +251,7 @@ function mtMinutes(){var p=new Intl.DateTimeFormat("en-US",{timeZone:"America/De
 var RB=[
  {sev:"hi",t:"Create the public repo and push once",d:"Gitar can only review pull requests, and the Sonar track wants features landing through PRs, not one at the end. The push was blocked earlier.",f:"Run: gh repo create Dennesssy/hallway-track --public --source . --remote origin --push. Then install the Gitar app on it."},
   {sev:"hi",t:"git-secrets hooks block commits",d:"Its pre-commit hook misfires on this Mac and rejects every commit. Edits are saved but uncommitted.",f:"Approve removing the three hook files and using gitleaks instead."},
-  {sev:"hi",t:"Rotate the Dash0 token",d:"The token was pasted into chat. It works, but chat is not private.",f:"Create a new token in Dash0, delete hallway-track-ingest, update OTEL_EXPORTER_OTLP_HEADERS in .env."},
   {sev:"hi",t:"Choose the cluster",d:"Radar track needs Kubernetes with Radar connected: the event cluster (join code at the Radar table) or OrbStack locally.",f:"Get the join code, or say OrbStack and we install Argo CD, the Dash0 operator and Radar there."},
-  {sev:"md",t:"Reconnect BrowserOS Neo",d:"Its tools are not in this session, so UI tests cannot run yet.",f:"Run /mcp and reconnect browseros-neo."},
   {sev:"md",t:"Where do we submit?",d:"The event pages name a 5:30 PM deadline but no form link.",f:"Ask at the registration desk. Fallback: repo URL plus README."},
   {sev:"lo",t:"Local paths in .agents/",d:"Coordination notes contain /Users/denn paths.",f:"Sanitize or stop tracking .agents/ before the push; pick a licence."}
 ];

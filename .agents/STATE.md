@@ -20,7 +20,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 | M1s | Swift server: Hallway Track API + HTMX fragments + ES + tests | queued | – | – | Starts from swift-server/ |
 | M2 | Web UI (vanilla JS) | **superseded** | 2885473 | stopped at launch | Rebuild as HTMX from swift-server/Public/index.html |
 | M2b | Design pass (docs/design/DESIGN.md) | queued | 3cd2558 (spec) | – | Folded into the HTMX rebuild |
-| M3 | UI tests | queued | – | – | BrowserOS neo ONLY, no Playwright (user 15:25) |
+| M3 | UI verification | queued | – | – | Manual checklist + swift test on HTML fragments. No Neo, no Playwright (user) |
 | M4 | Observability (OTel → Dash0) | queued | – | – | |
 | M5 | Container + K8s | queued | – | – | OrbStack k8s running, context `orbstack` |
 | M6 | CI + Gitar | queued | – | – | CI = typecheck + server tests |
@@ -56,7 +56,8 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 - 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.
 - 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); PerksMix is the disclosed starter (see 15:38); new code only for the HTMX UI.
 - 15:27 Add subagent state file (this file).
-- 15:25 Pause all agents. No Playwright; BrowserOS neo is the only UI test browser.
+- User: "ignore neo and rotation": no BrowserOS Neo anywhere, Dash0 token rotation dropped from open items. UI verification is a manual checklist plus server-side HTML tests.
+- 15:25 Pause all agents. No Playwright.
 - 15:20 DESIGN.md: win-focused features, layout, threaded + web animations.
 - 15:05 Full roster, no trimming. Full build.
 

@@ -109,7 +109,7 @@ Guards (required):
 - `prefers-reduced-motion: reduce` disables all of the above (the existing global rule stays), and the JS skips View Transitions and FLIP when `matchMedia('(prefers-reduced-motion: reduce)').matches`.
 - Budget: no animation longer than 300 ms on a user action; no layout-property animation; a `PerformanceObserver` for `longtask` logs any task over 50 ms to the console (and to telemetry if M4 exposes a browser hook).
 - Do not depend on Safari Technology Preview "Testable" flags (Web Animations custom effects / custom frame rate); judges will not have them.
-- Test in BrowserOS neo (the only UI test browser). Also open the page once by hand in Safari, because View Transitions and scroll timelines differ most between engines.
+- Verify by hand in Safari Technology Preview using `tests/ui/CHECKLIST.md`, because View Transitions and scroll timelines differ most between engines.
 
 ## 5. Visual system
 
@@ -139,7 +139,7 @@ Keep the AA-verified tokens from PROJECT.md (light/dark). Additions:
 - [ ] `?demo=1` slow toggle works; hidden without it
 - [ ] All motion is transform/opacity only, feature-detected, and off under reduced motion
 - [ ] No horizontal scroll at 390 px; zero serious/critical axe violations light + dark
-- [ ] BrowserOS neo walkthrough passes and is recorded in the test report (steps, screenshots, results)
+- [ ] `tests/ui/CHECKLIST.md` walkthrough completed by the human and recorded (steps, screenshots, results)
 
 ## 8. Patterns reused from earlier work (safari-docs `screen_capture_ui.html`)
 
@@ -149,7 +149,7 @@ Patterns only; no code is copied (that page is separate, finished work, and rule
 |---|---|---|
 | **Consent before sending** | Any "Share this search" or "Copy link with my needs" action: unchecked box "Include my needs in the link", and a status line that says "Nothing has been shared yet." until used | Default off; the status line is an `aria-live` region |
 | **Safe rendering** | Server escapes every value; only `<mark>` survives in highlights; no inline event handlers | Matches the CSP in section 9 |
-| **Proof for every UI claim** | Each acceptance check in section 7 has a recorded neo test result or screenshot, not a "looks fine" | Results saved under `tests/ui/` |
+| **Proof for every UI claim** | Each acceptance check in section 7 has a recorded result or screenshot in `tests/ui/CHECKLIST.md`, not a "looks fine" | Results saved under `tests/ui/` |
 | **Floating card material** | Ops strip and the "How this search ran" dialog use a raised card (`0 1px 3px` shadow, 6px radius). No `backdrop-filter` blur on text (contrast risk) | Keep text on solid surfaces |
 | **One spring curve** | A single easing, `cubic-bezier(.2,.8,.2,1)`, for every animation, with a small stagger (up to 7 items, 30 ms apart) on result cards | Off under `prefers-reduced-motion` |
 
@@ -183,7 +183,7 @@ Never assume support: judges' machines are unknown. Cache the result for the ses
 - Disabled under `prefers-reduced-data` or `navigator.connection.saveData`.
 - Hidden unless the capability check passes or the user opens `?experiments=1`.
 
-**Acceptance.** Capability states render correctly in Neo (WebGPU on, and with it disabled via the flag); consent dialog appears before any download; re-rank changes the order of at least one test query and is labelled; core search still passes every check with the experiment off.
+**Acceptance.** Capability states render correctly when checked by hand in Safari (WebGPU on, and with it disabled via the flag); consent dialog appears before any download; re-rank changes the order of at least one test query and is labelled; core search still passes every check with the experiment off.
 
 
 ## 11. The story that ties it together: "Keynote Rush" (requests R22, R23)

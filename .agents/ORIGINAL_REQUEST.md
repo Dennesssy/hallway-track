@@ -127,7 +127,7 @@ A "Keynote Rush" button (`?demo=1`) runs a real load generator (about 170 simula
 ### R23. Quiet route: inclusion that uses the live crowd signal (Merge Forward + Dash0 crowd map)
 A "Quiet route" filter ranks talks by the room-fill signal (R17) together with step-free access, captions and quiet-room-nearby, and explains why in plain words ("Room B is 40% full, step-free, captions on"). It serves attendees who find crowds hard (sensory sensitivity, anxiety, mobility) and shows the crowd metric doing something useful, not just a dashboard. Copy for it is added to `docs/design/COPY.md`.
 
-### R4. UI tests — run through **BrowserOS neo only** (user, 15:25: "u still have play wright in the instructions"). NO Playwright, no other browser automation. Covers accessibility scan, keyboard flow, phone width, light+dark, and DESIGN.md section 7. How to open/use/close neo: docs/REQUIREMENTS.md.
+### R4. UI verification. UI checks are manual: a checklist in `tests/ui/CHECKLIST.md` that the human works through in Safari Technology Preview (keyboard-only run, 390px width, light and dark, VoiceOver, JavaScript off), plus server-side tests that assert on the HTML fragments (`swift test`). No browser automation: no BrowserOS Neo, no Playwright (user: "ignore neo").
 ### R5. Observability — OpenTelemetry traces/logs/metrics exportable to Dash0 via env config (Dash0 track).
 ### R6. Container + Kubernetes — Dockerfile and manifests with health probes, secrets via k8s Secret (Radar track).
 ### R7. CI + review — GitHub Actions running typecheck + tests; Gitar review configuration (Sonar track).
@@ -140,7 +140,7 @@ A "Quiet route" filter ranks talks by the room-fill signal (R17) together with s
 - [ ] health, search, facets endpoints behave per PROJECT.md contract, incl. 400 on bad params
 - [ ] Elastic backend issues real ES requests (keyword + semantic) and fuses results; nothing hardcoded
 ### UI
-- [ ] BrowserOS neo test pass recorded (steps, screenshots, results) with zero serious/critical accessibility violations in light and dark
+- [ ] `tests/ui/CHECKLIST.md` completed with pass/fail and notes for every item, by the human, in Safari Technology Preview
 - [ ] keyboard-only search + filtering works; result count announced via aria-live
 - [ ] no horizontal scroll at 390px width
 - [ ] match chip, latency, commit/pod footer render from real API responses
@@ -148,7 +148,7 @@ A "Quiet route" filter ranks talks by the room-fill signal (R17) together with s
 - [ ] app starts with OTel enabled and emits spans (verified with a local exporter)
 - [ ] docker image builds and container serves /healthz
 - [ ] k8s manifests validate (client-side dry run at minimum)
-- [ ] CI workflow file runs the same commands that pass locally (`swift build` + `swift test`; UI tests are neo-only and run locally, not in CI)
+- [ ] CI workflow file runs the same commands that pass locally (`swift build` + `swift test`; UI checks are manual)
 ### Docs
 - [ ] BUILD.md + README commands are exactly the ones that work in this repo
 - [ ] no secrets committed; .env.example lists variable names only
@@ -172,7 +172,7 @@ A "Quiet route" filter ranks talks by the room-fill signal (R17) together with s
 3. Dash0 RUM endpoint and browser-safe token; operator install; SLO route.
 4. Cluster choice and architecture; ghcr push; Argo CD; Radar attach.
 5. htmx 2 options used in DESIGN.md (`transition:true`, `includeIndicatorStyles`).
-6. BrowserOS neo tools reachable from this session and from subagents (they were NOT present in the session's tool list at 15:49; run `/mcp` to reconnect).
+6. (dropped by user: BrowserOS neo)
 7. Whether organizers accept an earlier own project as a starter template (rule 8) and how projects are submitted. Ask at the desk.
 
 ### Before the first push (privacy)
