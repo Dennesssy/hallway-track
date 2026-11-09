@@ -10,5 +10,4 @@ research/perksmix-ref/
 !docs/assets/*.png
 dist/
 test-results/
-playwright-report/
 !.env.example

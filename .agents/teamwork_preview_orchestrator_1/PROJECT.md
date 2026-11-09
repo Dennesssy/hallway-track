@@ -49,4 +49,4 @@ Gitar: .gitar/review/*.md + .gitar/config/*.md. Dash0 envs per list above (OTLP 
 BrowserOS neo: MCP unreachable (installed, not running). UI worker must probe; if down write Soft handoff naming blocker; no silent fallback.
 
 ## Code Layout
-server/src/{main.ts,app.ts,config.ts,validate.ts,backends/{types,memory,elastic,fusion}.ts,telemetry.ts}, server/scripts/index-sessions.ts, server/test/*.test.ts; web/{index.html,app.js,styles.css}; e2e/*.spec.ts + playwright.config.ts; deploy/{Dockerfile? (root Dockerfile),k8s/*}; .github/workflows/ci.yml; .gitar/; BUILD.md README.md .env.example .dockerignore.
+server/src/{main.ts,app.ts,config.ts,validate.ts,backends/{types,memory,elastic,fusion}.ts,telemetry.ts}, server/scripts/index-sessions.ts, server/test/*.test.ts; web/{index.html,app.js,styles.css}; tests/ui/ (BrowserOS neo test plan + recorded results/screenshots; no Playwright); deploy/{Dockerfile? (root Dockerfile),k8s/*}; .github/workflows/ci.yml; .gitar/; BUILD.md README.md .env.example .dockerignore.
