@@ -50,6 +50,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 - DESIGN.md now adopts the PerksMix design language, with an AA-safe accent (#0056b3 text; starter #007bff is 3.98:1 on white).
 
 ## User decisions log (newest first)
+- Repo created and pushed: https://github.com/Dennesssy/hallway-track (PRIVATE for now). Gitar app install is next (human). Make public before submission and before Argo CD/Radar need to pull it: `gh repo edit Dennesssy/hallway-track --visibility public --accept-visibility-change-consequences`. From here: no commits to main, branch + PR per feature (R18).
 - Judging criteria pasted by user: added R18 (PR-per-feature, no commits to main after first push), R19 (project-aware Gitar rules), R20 (Radar/Dash0 usage evidence), R21 (matchmaker, RAG assistant, OpenLIT). Workers must branch + PR from now on.
 - Full scope: add reranker, multilingual, intent, relevance suite + CI gate, RUM, SLO/dashboards/alerts, synthetic, Dash0 operator, Argo CD, HPA, faults + runbooks, incident loop, WCAG audit, VoiceOver, JS-off, forced-colors, dyslexia option, EXPLAIN.md (R10-R15). Nothing is optional except R9. User: "i didnt tell you to leave it out, include everything needed".
 - 15:5x "use swift nio": HTTP server on SwiftNIO (NIOHTTP1) instead of Vapor; AsyncHTTPClient for Elasticsearch; fallback to Vapor if not working by 16:10.
