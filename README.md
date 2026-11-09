@@ -29,7 +29,10 @@ tools/              small helpers (QR decoder used to read the event banner)
 ```
 
 ## AI assistance disclosure
-This project is built with AI coding assistants (Claude Code, running a multi-agent team whose working notes are in `.agents/`). The human team member directs the work, reviews the code and is responsible for explaining the architecture and decisions. All code in this repository was written during the hackathon.
+This project is built with AI coding assistants (Claude Code, running a multi-agent team whose working notes are in `.agents/`). The human team member directs the work, reviews the code and is responsible for explaining the architecture and decisions. 
+
+### Starting template
+The server and first HTML page start from the team member's earlier project PerksMix/IaiPerk (a Swift Vapor server), imported **unmodified** in commit `d127f28` and labelled as a starter template. Everything after that commit was written during the hackathon. To see only today's work: `git diff d127f28..HEAD -- swift-server/`. Databases, seed data and secrets from the original project were not imported.
 
 ## License
 To be decided by the team before submission.

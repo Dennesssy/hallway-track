@@ -15,8 +15,10 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 | # | Name | Status | Last commit | Gate | Notes |
 |---|---|---|---|---|---|
 | Survey | Explorers a–d | done | – | n/a | handoffs in .agents/teamwork_preview_explorer_survey_*/ |
-| M1 | Server (API, ES + memory backends, indexer, tests) | built, **ungated**, needs change | 62fd2c8 | stopped at launch | Must add HTMX HTML-fragment routes (user 15:28) |
-| M2 | Web UI | **superseded** | 2885473 | stopped at launch | Vanilla-JS UI; user requires HTMX front end (15:28). Rebuild as HTMX. |
+| M0 | Starter template import (PerksMix Swift server + HTML) | done | d127f28 | n/a (unmodified import) | Base for all work. `swift build` verification running 15:40 |
+| M1 | Server (Node) | **superseded** | 62fd2c8 | stopped at launch | User 15:38: build from the Swift server. Node kept in history only. |
+| M1s | Swift server: Hallway Track API + HTMX fragments + ES + tests | queued | – | – | Starts from swift-server/ |
+| M2 | Web UI (vanilla JS) | **superseded** | 2885473 | stopped at launch | Rebuild as HTMX from swift-server/Public/index.html |
 | M2b | Design pass (docs/DESIGN.md) | queued | 3cd2558 (spec) | – | Folded into the HTMX rebuild |
 | M3 | UI tests | queued | – | – | BrowserOS neo ONLY, no Playwright (user 15:25) |
 | M4 | Observability (OTel → Dash0) | queued | – | – | |
@@ -43,6 +45,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 | auditor_M2_1 | auditor | haiku | M2 | stopped | 15:25 |
 
 ## User decisions log (newest first)
+- 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.
 - 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); own code only, no PerksMix copy.
 - 15:27 Add subagent state file (this file).
 - 15:25 Pause all agents. No Playwright; BrowserOS neo is the only UI test browser.

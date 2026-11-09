@@ -37,6 +37,14 @@ UI spec the user already approved (from conversation):
 ### R1. Server — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
 ### R2. Server tests — real automated tests; Elasticsearch integration tests run when credentials exist and are reported SKIPPED (never passed) otherwise.
 ### R3. Web UI — per the approved spec above, optimized for hackathon judging.
+### R0. Starting point: PerksMix Swift server + HTML (user, 15:38: "perks mix has a swift server and a html to start build with")
+- The build STARTS FROM `swift-server/` (Vapor 4 + GRDB + swift-crypto), imported unmodified in commit d127f28 as a template. Today's work is the diff from that commit; keep it that way so judges can see what was built today.
+- The starting HTML is `swift-server/Public/index.html` (served by the Swift server's FileMiddleware).
+- Server language is therefore **Swift/Vapor**, not Node. The Node server from M1 (commit 62fd2c8) is superseded; leave it in git history, do not extend it.
+- Remove starter features that don't serve Hallway Track (passkey/email auth, chat, GPU/perks routes, analytics) unless a milestone needs them; replace perks data with data/sessions.json.
+- Never commit databases, seed data with user info, or the `pepper` secret (gitignored).
+- Elasticsearch from Swift: plain HTTPS calls via Vapor's client (no official Swift ES SDK assumed). Telemetry to Dash0: OpenTelemetry for Swift (verify the package before relying on it).
+- PerksMix design language: /Users/denn/BootstrapKit/iaiperk/perks/design.md (light, data-dense, metric cards with sparklines, sortable tables). DESIGN.md must adopt it.
 ### R3a. HTMX front end (user, 15:28: "the front end needs to be HTMX; bc perkmix was htmx")
 The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN dependency at the venue). The server renders HTML fragments (cards, counts, ops strip) that htmx swaps in; JSON API stays for tests/integrations. Server-side HTML escaping on every value. Minimal custom JS only where htmx cannot do it (WAAPI FLIP, sparkline). Use htmx View Transitions (`transition:true`) for the DESIGN.md motion plan. Do NOT copy PerksMix code (rule 8); same approach, new code. The earlier vanilla-JS UI (commit 2885473) is superseded.
 ### R4. UI tests — run through **BrowserOS neo only** (user, 15:25: "u still have play wright in the instructions"). NO Playwright, no other browser automation. Covers accessibility scan, keyboard flow, phone width, light+dark, and DESIGN.md section 7. How to open/use/close neo: docs/REQUIREMENTS.md.
