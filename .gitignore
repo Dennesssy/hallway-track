@@ -4,3 +4,7 @@ node_modules/
 .DS_Store
 *.png
 *.HEIC
+
+# pre-existing PerksMix code: local reference only, never shipped (hackathon rule 8)
+research/perksmix-ref/
+!docs/assets/*.png
