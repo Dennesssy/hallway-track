@@ -138,3 +138,22 @@ Keep the AA-verified tokens from PROJECT.md (light/dark). Additions:
 - [ ] All motion is transform/opacity only, feature-detected, and off under reduced motion
 - [ ] No horizontal scroll at 390 px; zero serious/critical axe violations light + dark
 - [ ] BrowserOS neo walkthrough passes and is recorded in the test report (steps, screenshots, results)
+
+## 8. Patterns reused from earlier work (safari-docs `screen_capture_ui.html`)
+
+Patterns only; no code is copied (that page is separate, finished work, and rule 8 forbids shipping it). Each item below is rebuilt fresh for HTMX.
+
+| Pattern | Where it shows up here | Rule |
+|---|---|---|
+| **Consent before sending** | Any "Share this search" or "Copy link with my needs" action: unchecked box "Include my needs in the link", and a status line that says "Nothing has been shared yet." until used | Default off; the status line is an `aria-live` region |
+| **Safe rendering** | Server escapes every value; only `<mark>` survives in highlights; no inline event handlers | Matches the CSP in section 9 |
+| **Proof for every UI claim** | Each acceptance check in section 7 has a recorded neo test result or screenshot, not a "looks fine" | Results saved under `tests/ui/` |
+| **Floating card material** | Ops strip and the "How this search ran" dialog use a raised card (`0 1px 3px` shadow, 6px radius). No `backdrop-filter` blur on text (contrast risk) | Keep text on solid surfaces |
+| **One spring curve** | A single easing, `cubic-bezier(.2,.8,.2,1)`, for every animation, with a small stagger (up to 7 items, 30 ms apart) on result cards | Off under `prefers-reduced-motion` |
+
+Fixes to what that page lacked (required here, since Merge Forward scores accessibility): every control is a real `<button>` or link with an accessible name; visible `:focus-visible` ring on everything; landmarks (`header`, `main`, `footer`, `search` role); `safe-area-inset` padding for phones.
+
+Skipped on purpose: the WebGPU animated background (battery and contrast), traffic-light window buttons, draggable windows.
+
+## 9. Security headers (borrowed from `capture-server`'s approach)
+Set by the SwiftNIO server on every response: `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and a Content-Security-Policy of `default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`. htmx is vendored, so no external script host is needed. Add `connect-src 'self'`. This means no inline `<script>` or `onclick` anywhere in the HTMX pages; the small custom scripts live in `Public/app.js`. Because htmx can inject inline styles when `htmx.config.includeIndicatorStyles` is true, set it to `false` and style the loading indicator ourselves.
