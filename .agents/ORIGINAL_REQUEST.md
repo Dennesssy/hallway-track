@@ -34,7 +34,7 @@ UI spec the user already approved (from conversation):
 - Search embeddings: server-side via Elasticsearch semantic_text (Jina v5 through Elastic Inference Service, unverified on this trial); NOT browser ONNX
 
 ## Requirements
-### R1. Server — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
+### R1. Server (Swift/Vapor, per R0; supersedes the earlier Node plan) — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
 ### R2. Server tests — real automated tests; Elasticsearch integration tests run when credentials exist and are reported SKIPPED (never passed) otherwise.
 ### R3. Web UI — per the approved spec above, optimized for hackathon judging.
 ### R0. Starting point: PerksMix Swift server + HTML (user, 15:38: "perks mix has a swift server and a html to start build with")
@@ -55,8 +55,8 @@ The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN depend
 
 ## Acceptance Criteria
 ### Server
-- [ ] typecheck command exits 0
-- [ ] server test command exits 0; ES integration tests show SKIPPED without credentials
+- [ ] `swift build` exits 0 (replaces the Node typecheck)
+- [ ] `swift test` exits 0; ES integration tests show SKIPPED without credentials
 - [ ] health, search, facets endpoints behave per PROJECT.md contract, incl. 400 on bad params
 - [ ] Elastic backend issues real ES requests (keyword + semantic) and fuses results; nothing hardcoded
 ### UI
@@ -68,7 +68,7 @@ The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN depend
 - [ ] app starts with OTel enabled and emits spans (verified with a local exporter)
 - [ ] docker image builds and container serves /healthz
 - [ ] k8s manifests validate (client-side dry run at minimum)
-- [ ] CI workflow file runs the same commands that pass locally (typecheck + server tests; UI tests are neo-only and run locally, not in CI)
+- [ ] CI workflow file runs the same commands that pass locally (`swift build` + `swift test`; UI tests are neo-only and run locally, not in CI)
 ### Docs
 - [ ] BUILD.md + README commands are exactly the ones that work in this repo
 - [ ] no secrets committed; .env.example lists variable names only

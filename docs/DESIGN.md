@@ -1,6 +1,6 @@
 # Hallway Track: design
 
-What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the existing `web/` (M2) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`.
+What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the PerksMix starter in `swift-server/` (HTML in `swift-server/Public/index.html`) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`. The earlier Node and vanilla-JS prototypes were removed (commits 62fd2c8, 2885473 in history).
 
 No design guarantees a win. Every item below is tied to a written judging criterion from `docs/EVENT.md`, so each one is a point a judge can tick.
 
@@ -110,6 +110,12 @@ Guards (required):
 - Test in BrowserOS neo (the only UI test browser). Also open the page once by hand in Safari, because View Transitions and scroll timelines differ most between engines.
 
 ## 5. Visual system
+
+**Starter design language (PerksMix `perks/design.md`):** light, data-dense, professional. Page `#f8f9fa`; white cards with 1px `#dee2e6` borders and 6px radius; subtle shadow `0 1px 3px rgba(0,0,0,.1)`; Segoe UI system stack at 12–13px; uppercase 10px column headers; metric cards with a small label, large value and trend. Adopt the look, density and components, with new code.
+
+Mapping: metric cards → ops strip tiles (latency, SLO, trace); sortable portfolio table → optional "Schedule view" of talks (sortable by day, time, room, track); card/table chrome → result cards.
+
+One change from the starter: its accent `#007bff` is 3.98:1 on white, below the 4.5:1 AA minimum for text. Use `#0056b3` for text and focus rings (7.5:1) and keep `#007bff` only for non-text fills. Body text base is 14px, not 12px, for readability.
 
 Keep the AA-verified tokens from PROJECT.md (light/dark). Additions:
 - Match chips: `keyword` = outline, `semantic` = filled accent, `both` = filled accent + outline. Text label always present (state not by color alone).

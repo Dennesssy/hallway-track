@@ -11,8 +11,8 @@ Goal: win the Cloud Native Hackathon (deadline 2026-11-09 5:30 PM MT). One proje
         ▼                             │ image build + deploy
  ┌──────────────┐              ┌──────▼───────────────────────────────┐
  │ Browser UI   │  HTTPS       │ KUBERNETES (OrbStack or Radar cluster)│
- │ plain HTML/JS│ ───────────▶ │  ┌────────────────────────────┐      │
- │ a11y filters │              │  │ Node/TS API  (OTel SDK)    │      │
+ │ HTMX (htmx 2)│ ───────────▶ │  ┌────────────────────────────┐      │
+ │ a11y filters │              │  │ Swift/Vapor API (OTel)     │      │
  └──────────────┘              │  └───┬──────────────┬─────────┘      │
    [Merge Forward]             └──────┼──────────────┼────────────────┘
                                       │ hybrid query │ OTLP traces/logs/metrics
@@ -33,20 +33,22 @@ Goal: win the Cloud Native Hackathon (deadline 2026-11-09 5:30 PM MT). One proje
 | Item | Limit |
 |---|---|
 | Deadline | 5:30 PM MT; hard freeze 5:15 PM |
-| Code origin | must start after kickoff; PerksMix is reference only |
+| Code origin | starter template = PerksMix Swift server + HTML, imported unmodified in d127f28 and disclosed; everything after it is written today. PerksMix databases, seed data and secrets are not imported |
 | Disclosure | AI assistance stated in README |
 | Repo | public, README with setup |
-| Stack | Node 22, TypeScript, plain HTML/JS, no front-end build |
+| Stack | Swift 6 / Vapor 4 (trimmed PerksMix starter, commit d127f28), HTMX 2 with server-rendered HTML fragments, no front-end build step |
 
 ## Layout
 ```
 Hackathon-Slc/
 ├─ ARCHITECTURE.md
-├─ docs/EVENT.md          event details, rules, links
+├─ docs/                  EVENT.md, DESIGN.md, COPY.md
+├─ instruction.md         the event website's instructions
 ├─ plans/board.html       visual plan board (also published as artifact)
-├─ research/              sponsors.md, perksmix-ref/ (reference only)
+├─ research/              sponsors.md
 ├─ data/sessions.json     60 fictional sessions
-└─ (next) api/ web/ deploy/ .github/ README.md
+├─ swift-server/          Vapor server + Public/index.html (starter d127f28, then trimmed)
+└─ (next) deploy/ .github/ .gitar/ BUILD.md
 ```
 
 ## Roadmap

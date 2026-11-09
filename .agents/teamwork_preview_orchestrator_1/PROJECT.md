@@ -1,3 +1,5 @@
+> **PARTLY SUPERSEDED (user 15:38):** the build starts from the Swift/Vapor starter in `swift-server/` (see ../ORIGINAL_REQUEST.md R0). The HTTP API contract, env var names, a11y tokens and Gitar/Radar/k8s facts below remain valid. Everything Node-specific (npm scripts, TypeScript files, `node --test`, `e2e/`, package.json, typecheck) is replaced: build = `swift build`, tests = `swift test`, server code under `swift-server/Sources/App`, UI = HTMX in `swift-server/Public`. Front end must be HTMX (R3a); UI tests via BrowserOS neo only.
+
 # PROJECT — Hallway Track (synthesized 2026-11-09 15:12 MT from Explorer survey a_data, b_toolchain, c_ui, d_deploy)
 
 Explorer evidence lives in each .agents/teamwork_preview_explorer_survey_*/ (BRIEFING/progress; reports were relayed in messages, not files — see PROJECT notes below).

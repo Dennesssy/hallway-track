@@ -44,6 +44,11 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 | challenger_M2_1, challenger_M2_2 | challenger | haiku | M2 | stopped | 15:25 |
 | auditor_M2_1 | auditor | haiku | M2 | stopped | 15:25 |
 
+## Alignment fix (user: "check for misallignment and fix")
+- Removed superseded Node/vanilla-JS code from the working tree (server/, web/, package.json, tsconfig.json); still in git history at 62fd2c8 and 2885473.
+- ARCHITECTURE.md, README.md, ORIGINAL_REQUEST.md, DESIGN.md, PROJECT.md, board.html updated to Swift + HTMX.
+- DESIGN.md now adopts the PerksMix design language, with an AA-safe accent (#0056b3 text; starter #007bff is 3.98:1 on white).
+
 ## User decisions log (newest first)
 - 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.
 - 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); own code only, no PerksMix copy.

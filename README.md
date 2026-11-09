@@ -21,7 +21,11 @@ Architecture: see [ARCHITECTURE.md](ARCHITECTURE.md). Event rules and criteria: 
 ```
 ARCHITECTURE.md     system topology and constraints
 docs/EVENT.md       event details, rules, judging criteria
+docs/DESIGN.md      UI design and motion plan
+docs/COPY.md        UX copy
+swift-server/       Swift (Vapor) server and HTMX front end, built from the PerksMix starter
 data/sessions.json  60 fictional conference sessions (seed data, no real people)
+instruction.md      the event website's instructions, rules and track setup
 plans/board.html    the team's time plan
 research/           sponsor integration notes
 tools/              small helpers (QR decoder used to read the event banner)
@@ -29,7 +33,7 @@ tools/              small helpers (QR decoder used to read the event banner)
 ```
 
 ## AI assistance disclosure
-This project is built with AI coding assistants (Claude Code, running a multi-agent team whose working notes are in `.agents/`). The human team member directs the work, reviews the code and is responsible for explaining the architecture and decisions. 
+This project is built with AI coding assistants (Claude Code, running a multi-agent team whose working notes are in `.agents/`). The human team member directs the work, reviews the code and is responsible for explaining the architecture and decisions.
 
 ### Starting template
 The server and first HTML page start from the team member's earlier project PerksMix/IaiPerk (a Swift Vapor server), imported **unmodified** in commit `d127f28` and labelled as a starter template. Everything after that commit was written during the hackathon. To see only today's work: `git diff d127f28..HEAD -- swift-server/`. Databases, seed data and secrets from the original project were not imported.
