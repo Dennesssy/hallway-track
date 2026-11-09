@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Hallway Track - find conference sessions</title>
+<meta name="description" content="Search conference sessions in plain language, filtered by the accessibility needs that matter to you.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231D4ED8'/%3E%3Cpath d='M8 16h16M16 8v16' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#results">Skip to results</a>
+<header class="site">
+  <div class="wrap">
+    <h1>Hallway Track</h1>
+    <p class="tagline">Describe what you want to learn in plain words. We search by keyword and meaning, and filter by the accessibility your day needs.</p>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <form id="search-form" role="search" aria-label="Search sessions" autocomplete="off">
+    <label for="q">Search sessions</label>
+    <div class="row">
+      <input id="q" name="q" type="search" maxlength="200" placeholder="e.g. sign language security talks" enterkeyhint="search">
+      <button type="submit" class="btn primary">Search</button>
+    </div>
+    <div class="chips" role="group" aria-label="Sample searches">
+      <span class="chips-label">Try:</span>
+      <button type="button" class="chip" data-q="sign language security talks">sign language security talks</button>
+      <button type="button" class="chip" data-q="beginner observability">beginner observability</button>
+      <button type="button" class="chip" data-q="quiet room AI">quiet room AI</button>
+    </div>
+  </form>
+
+  <details class="filters" id="filters" open>
+    <summary>Filters <span id="filter-badge" class="badge" hidden></span></summary>
+    <div class="filter-body">
+      <fieldset id="flags">
+        <legend>Accessibility needs</legend>
+        <div class="checks" id="flag-list"></div>
+      </fieldset>
+      <div class="selects">
+        <div><label for="track">Track</label><select id="track"><option value="">All tracks</option></select></div>
+        <div><label for="level">Level</label><select id="level"><option value="">All levels</option></select></div>
+        <div><label for="day">Day</label><select id="day"><option value="">All days</option></select></div>
+      </div>
+      <button type="button" class="btn" id="clear">Clear filters</button>
+    </div>
+  </details>
+
+  <section aria-labelledby="results-h">
+    <div class="status-row">
+      <h2 id="results-h" class="count" tabindex="-1">Sessions</h2>
+      <p id="count" class="sr-count" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p id="meta-line" class="metaline"></p>
+    </div>
+    <div class="tools">
+      <button type="button" class="btn" id="slow" aria-describedby="slow-note">Run slow query demo</button>
+      <span id="slow-note" class="note">Adds a deliberate server delay (slow=true) so you can see latency in traces. Not a real slowdown.</span>
+    </div>
+    <div id="results" tabindex="-1">
+      <div id="state" class="state" hidden></div>
+      <ul id="list" class="cards" aria-busy="false"></ul>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap"><p id="footer">Build <span id="f-commit">unknown</span> &middot; pod <span id="f-pod">unknown</span> &middot; backend <span id="f-backend">unknown</span></p></div>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
