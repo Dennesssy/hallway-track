@@ -51,7 +51,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 
 ## User decisions log (newest first)
 - 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.
-- 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); own code only, no PerksMix copy.
+- 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); PerksMix is the disclosed starter (see 15:38); new code only for the HTMX UI.
 - 15:27 Add subagent state file (this file).
 - 15:25 Pause all agents. No Playwright; BrowserOS neo is the only UI test browser.
 - 15:20 DESIGN.md: win-focused features, layout, threaded + web animations.
