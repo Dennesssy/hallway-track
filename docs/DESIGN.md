@@ -1,6 +1,6 @@
 # Hallway Track: design
 
-What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the PerksMix starter in `swift-server/` (HTML in `swift-server/Public/index.html`) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`. The earlier Node and vanilla-JS prototypes were removed (commits 62fd2c8, 2885473 in history).
+What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the PerksMix starter in `swift-server/` (HTML in `swift-server/Public/index.html`; HTTP layer on SwiftNIO) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`. The earlier Node and vanilla-JS prototypes were removed (commits 62fd2c8, 2885473 in history).
 
 No design guarantees a win. Every item below is tied to a written judging criterion from `docs/EVENT.md`, so each one is a point a judge can tick.
 

@@ -12,7 +12,7 @@ Goal: win the Cloud Native Hackathon (deadline 2026-11-09 5:30 PM MT). One proje
  ┌──────────────┐              ┌──────▼───────────────────────────────┐
  │ Browser UI   │  HTTPS       │ KUBERNETES (OrbStack or Radar cluster)│
  │ HTMX (htmx 2)│ ───────────▶ │  ┌────────────────────────────┐      │
- │ a11y filters │              │  │ Swift/Vapor API (OTel)     │      │
+ │ a11y filters │              │  │ Swift/NIO API (OTel)       │      │
  └──────────────┘              │  └───┬──────────────┬─────────┘      │
    [Merge Forward]             └──────┼──────────────┼────────────────┘
                                       │ hybrid query │ OTLP traces/logs/metrics
@@ -36,7 +36,7 @@ Goal: win the Cloud Native Hackathon (deadline 2026-11-09 5:30 PM MT). One proje
 | Code origin | starter template = PerksMix Swift server + HTML, imported unmodified in d127f28 and disclosed; everything after it is written today. PerksMix databases, seed data and secrets are not imported |
 | Disclosure | AI assistance stated in README |
 | Repo | public, README with setup |
-| Stack | Swift 6 / Vapor 4 (trimmed PerksMix starter, commit d127f28), HTMX 2 with server-rendered HTML fragments, no front-end build step |
+| Stack | Swift 6 on SwiftNIO (HTTP server written on NIOHTTP1; PerksMix Vapor starter imported in d127f28, then trimmed), AsyncHTTPClient for Elasticsearch, HTMX 2 with server-rendered HTML fragments, no front-end build step |
 
 ## Layout
 ```

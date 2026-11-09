@@ -34,13 +34,14 @@ UI spec the user already approved (from conversation):
 - Search embeddings: server-side via Elasticsearch semantic_text (Jina v5 through Elastic Inference Service, unverified on this trial); NOT browser ONNX
 
 ## Requirements
-### R1. Server (Swift/Vapor, per R0; supersedes the earlier Node plan) — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
+### R1. Server (Swift on SwiftNIO, per R0; supersedes the earlier Node plan) — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
 ### R2. Server tests — real automated tests; Elasticsearch integration tests run when credentials exist and are reported SKIPPED (never passed) otherwise.
 ### R3. Web UI — per the approved spec above, optimized for hackathon judging.
 ### R0. Starting point: PerksMix Swift server + HTML (user, 15:38: "perks mix has a swift server and a html to start build with")
 - The build STARTS FROM `swift-server/` (Vapor 4 + GRDB + swift-crypto), imported unmodified in commit d127f28 as a template. Today's work is the diff from that commit; keep it that way so judges can see what was built today.
 - The starting HTML is `swift-server/Public/index.html` (served by the Swift server's FileMiddleware).
-- Server language is therefore **Swift/Vapor**, not Node. The Node server from M1 (commit 62fd2c8) is superseded; leave it in git history, do not extend it.
+- **SwiftNIO (user, 15:5x: "use swift nio"):** the HTTP server is written directly on SwiftNIO (`NIOCore`, `NIOPosix`, `NIOHTTP1`; swift-nio 2.101 is already resolved in the starter), replacing Vapor in the Hallway Track target. Linux-capable, unlike `capture-server` (Network.framework). Elasticsearch calls use `AsyncHTTPClient` (NIO-based, 1.36 already resolved); logging/metrics use swift-log/swift-metrics. Drop Vapor, GRDB and swift-crypto from the dependency list. Needs: a small router, static file serving with HTMX vendored files, security headers (nosniff, no-referrer, frame denial, CSP without inline scripts), gzip optional, graceful shutdown, `/healthz` + `/readyz`, request timeouts. Fallback if raw NIO is not working by 16:10 MT: keep Vapor (itself built on NIO) rather than miss the deadline.
+- Server language is therefore **Swift on NIO**, not Node. The Node server from M1 (commit 62fd2c8) is superseded; leave it in git history, do not extend it.
 - Remove starter features that don't serve Hallway Track (passkey/email auth, chat, GPU/perks routes, analytics) unless a milestone needs them; replace perks data with data/sessions.json.
 - Never commit databases, seed data with user info, or the `pepper` secret (gitignored).
 - Elasticsearch from Swift: plain HTTPS calls via Vapor's client (no official Swift ES SDK assumed). Telemetry to Dash0: OpenTelemetry for Swift (verify the package before relying on it).

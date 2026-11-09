@@ -50,6 +50,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 - DESIGN.md now adopts the PerksMix design language, with an AA-safe accent (#0056b3 text; starter #007bff is 3.98:1 on white).
 
 ## User decisions log (newest first)
+- 15:5x "use swift nio": HTTP server on SwiftNIO (NIOHTTP1) instead of Vapor; AsyncHTTPClient for Elasticsearch; fallback to Vapor if not working by 16:10.
 - 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.
 - 15:28 Front end must be **HTMX** ("bc perkmix was htmx"). Use htmx 2.x, vendored locally (venue wifi); PerksMix is the disclosed starter (see 15:38); new code only for the HTMX UI.
 - 15:27 Add subagent state file (this file).
