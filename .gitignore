@@ -8,3 +8,7 @@ node_modules/
 # pre-existing PerksMix code: local reference only, never shipped (hackathon rule 8)
 research/perksmix-ref/
 !docs/assets/*.png
+dist/
+test-results/
+playwright-report/
+!.env.example

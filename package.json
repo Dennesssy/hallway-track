@@ -1,0 +1,21 @@
+{
+  "name": "hallway-track",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.17" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "start": "node --experimental-strip-types server/src/main.ts",
+    "index": "node --experimental-strip-types server/scripts/index-sessions.ts",
+    "test:server": "node --experimental-strip-types --test server/test/*.test.ts",
+    "test": "npm run test:server"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "9.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
