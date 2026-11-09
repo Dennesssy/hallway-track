@@ -106,3 +106,18 @@ The pod name updates after each search (announced to nobody; it is visual only).
 - Times are 24-hour in data; format per locale.
 - German and Finnish expand about 30%; filter labels must wrap, not truncate.
 - Avoid idioms: "jump to" in the search hint should become "go to" in languages where "jump" reads oddly.
+
+## On-device re-ranking (experimental)
+| Element | Copy |
+|---|---|
+| Button (WebGPU available) | Re-rank on this device (experimental) |
+| Button (WebAssembly only) | Re-rank on this device (slower, experimental) |
+| Button (not supported) | not shown |
+| Dialog title | Run search ranking on this device? |
+| Dialog body | This downloads a model of about {size} MB once and runs it on your {gpu_or_processor}. Your search text is still sent to the server for normal search. |
+| Dialog buttons | Download and run / Not now |
+| Idle status | Model not downloaded. |
+| Progress (aria-live) | Downloading model: {percent}% |
+| Running | Ranking {count} talks on this device… |
+| Done chip | On-device |
+| Error | Couldn't run the model on this device. Your normal results are unchanged. |

@@ -157,3 +157,28 @@ Skipped on purpose: the WebGPU animated background (battery and contrast), traff
 
 ## 9. Security headers (borrowed from `capture-server`'s approach)
 Set by the SwiftNIO server on every response: `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and a Content-Security-Policy of `default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`. htmx is vendored, so no external script host is needed. Add `connect-src 'self'`. This means no inline `<script>` or `onclick` anywhere in the HTMX pages; the small custom scripts live in `Public/app.js`. Because htmx can inject inline styles when `htmx.config.includeIndicatorStyles` is true, set it to `false` and style the loading indicator ourselves.
+
+## 10. Experiment: on-device re-ranking with WebGPU ("just for fun", stretch, P2)
+
+Priority: last. Built only after the four must-have demo moments pass. The core search is unchanged and works without it (progressive enhancement).
+
+**What it does.** A "Re-rank on this device (experimental)" button appears under the result count only when the browser can run it. Pressing it loads a small text-embedding model in the browser, embeds the query and the abstracts of the top results (20 to 50), and re-sorts them by cosine similarity. Cards re-order with the existing FLIP animation and get a chip "On-device". The server still receives the search query as before; only the re-ranking happens locally.
+
+**Capability check (runs once on page load, no download).**
+1. `navigator.gpu` present? If not: state "no-webgpu".
+2. `await navigator.gpu.requestAdapter()` returns an adapter? If not: "no-adapter".
+3. Otherwise: "webgpu". If WebGPU is missing, offer a slower WebAssembly run instead of hiding the feature, because ONNX Runtime Web has a WASM backend (unverified for the chosen model; confirm before building).
+Never assume support: judges' machines are unknown. Cache the result for the session.
+
+**Offer and consent (pattern from section 8).** Dialog before the first download: "Run search ranking on this device? This downloads a model of about {size} MB once and runs it on your {GPU or processor}. Your search text is still sent to the server for normal search." Buttons "Download and run" / "Not now". Status line: "Model not downloaded." until used. Never auto-download.
+
+**Which model.** The pasted `MODEL::EMBEDDING` schema (`input_ids`, `image_features`, `audio_features` → `embeddings`) looks like the input-embedding stage of a multimodal ONNX Runtime GenAI model config. That stage turns tokens plus image/audio features into LLM input embeddings; it does not produce a sentence vector for search, so it is the wrong piece for re-ranking. Use a standalone text-embedding model that outputs one vector per text. Candidates, all unverified for size and browser speed: `jina-embeddings-v5-text-nano` (its Hugging Face card says ONNX weights are in an `onnx` subfolder; 239M parameters, 768 dims, so likely too heavy to download live) or a much smaller sentence-embedding model. Decide by measuring download size and per-query time in BrowserOS Neo before committing.
+
+**Rules.**
+- The same model must embed the query and the candidate texts. The server-side Jina vectors in Elasticsearch are not reused, so no index changes are needed.
+- Vendor the runtime and model files under `Public/vendor/` (no external hosts at the venue; matches the CSP in section 9). The CSP will need `'wasm-unsafe-eval'` for WebAssembly and possibly `worker-src 'self' blob:`; verify both in Neo.
+- Run inference in a Web Worker so the page stays responsive; show progress ("Downloading model: 40%") in an `aria-live` region.
+- Disabled under `prefers-reduced-data` or `navigator.connection.saveData`.
+- Hidden unless the capability check passes or the user opens `?experiments=1`.
+
+**Acceptance.** Capability states render correctly in Neo (WebGPU on, and with it disabled via the flag); consent dialog appears before any download; re-rank changes the order of at least one test query and is labelled; core search still passes every check with the experiment off.
