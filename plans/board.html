@@ -1,0 +1,288 @@
+<title>Hackathon Command Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: sticky clock band, then read-order = clock, verdict, path, blockers, tracks, shortcuts, lanes, rules.
+   Palette: slate neutrals tinted toward teal; signal orange is reserved for deadline/blockers. */
+:root{
+  --bg:#EDF0F2; --panel:#FFFFFF; --ink:#13202A; --mute:#5A6B78; --line:#D3DAE0;
+  --accent:#0A6C86; --accent-soft:#D5EAF0; --warn:#C2410C; --warn-soft:#FBE3D6;
+  --ok:#2B7A4B; --ok-soft:#DCEFE3; --amber:#9A6A00; --amber-soft:#F6EBC9; --bar:#0A6C86;
+  --f-display:"Space Grotesk",system-ui,sans-serif; --f-body:Inter,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D151B; --panel:#15212A; --ink:#E6EDF2; --mute:#93A4B1; --line:#27363F;
+  --accent:#4FC3DF; --accent-soft:#12303B; --warn:#FF8A4C; --warn-soft:#3A2214;
+  --ok:#5CCB8A; --ok-soft:#14301F; --amber:#E5B94A; --amber-soft:#33290F; --bar:#4FC3DF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D151B; --panel:#15212A; --ink:#E6EDF2; --mute:#93A4B1; --line:#27363F;
+  --accent:#4FC3DF; --accent-soft:#12303B; --warn:#FF8A4C; --warn-soft:#3A2214;
+  --ok:#5CCB8A; --ok-soft:#14301F; --amber:#E5B94A; --amber-soft:#33290F; --bar:#4FC3DF; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+h2{font-size:20px;margin-bottom:12px}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+section{margin-top:28px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+/* clock band */
+.clock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:12px 0;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.clock-row{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.count{font-family:var(--f-mono);font-weight:700;font-size:clamp(30px,7vw,48px);color:var(--warn);line-height:1}
+.meter{height:8px;background:var(--line);border-radius:4px;margin-top:10px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--warn);width:0}
+.freeze{color:var(--mute);font-size:13px}
+/* verdict */
+.verdict{display:grid;gap:14px;grid-template-columns:1.4fr 1fr}
+@media(max-width:720px){.verdict{grid-template-columns:1fr}}
+.verdict h1{font-size:clamp(24px,5vw,34px);line-height:1.15}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.03em;white-space:nowrap}
+.p-hi{background:var(--warn-soft);color:var(--warn)} .p-md{background:var(--amber-soft);color:var(--amber)}
+.p-lo{background:var(--accent-soft);color:var(--accent)} .p-ok{background:var(--ok-soft);color:var(--ok)}
+.stat{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line)}
+.stat:last-child{border:0}
+/* gantt */
+.gantt{display:grid;gap:10px}
+.ph-label{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13px}
+.ph-label b{font-family:var(--f-display);font-size:14px}
+.track{position:relative;height:22px;background:var(--bg);border-radius:4px;border:1px solid var(--line)}
+.bar{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--bar);opacity:.35;display:flex;align-items:center;padding-left:6px;font:700 10px var(--f-mono);color:var(--ink);white-space:nowrap;overflow:hidden}
+.bar.cur{opacity:1;color:#fff}
+.bar.done{background:var(--ok);opacity:.6}
+.axis{display:flex;justify-content:space-between;font:11px var(--f-mono);color:var(--mute);margin-top:2px}
+.nowline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--warn);z-index:2}
+/* tasks */
+.tasks{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:2px}
+.tasks label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:2px 0;cursor:pointer}
+.tasks input{margin-top:4px;accent-color:var(--accent)}
+.tasks input:checked+span{color:var(--mute);text-decoration:line-through}
+.who{font:700 10px var(--f-mono);padding:1px 6px;border-radius:4px;background:var(--accent-soft);color:var(--accent);margin-left:4px}
+.who.you{background:var(--warn-soft);color:var(--warn)}
+details{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:13.5px}
+/* blockers */
+.rb{display:grid;gap:6px}
+.rb h3{font-size:15px}
+.rb p{margin:0;font-size:13.5px;color:var(--mute)}
+.rb .fix{color:var(--ink)}
+/* matrix */
+.mx-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:700 11px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.dot.o{background:transparent;border:2px solid var(--line)}
+/* diagram */
+svg{max-width:100%;height:auto;display:block}
+svg text{font-family:var(--f-mono);font-size:12px;fill:var(--ink)}
+svg .b{fill:var(--panel);stroke:var(--line);stroke-width:1.5}
+svg .a{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+svg .w{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.5}
+svg .l{stroke:var(--mute);stroke-width:1.5;fill:none}
+svg .s{fill:var(--mute);font-size:10.5px}
+.foot{margin-top:32px;font-size:12px;color:var(--mute)}
+a{color:var(--accent)}
+.btn{font:600 12px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+</style>
+
+<div class="clock"><div class="wrap">
+  <div class="clock-row">
+    <div><div class="eyebrow">Cloud Native Hackathon · Mon Nov 9 2026 · Mountain Time</div>
+      <div class="count" id="count">--:--:--</div></div>
+    <div style="text-align:right"><div class="eyebrow">Submission closes 5:30 PM · hard freeze 5:15 PM</div>
+      <div class="freeze" id="clocknow">now --:--</div></div>
+  </div>
+  <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+</div></div>
+
+<div class="wrap">
+
+<section>
+  <div class="verdict">
+    <div class="panel">
+      <div class="eyebrow">Verdict</div>
+      <h1>Ship one project that enters all 5 prize tracks. Build window is under 3 hours.</h1>
+      <p style="color:var(--mute);margin:10px 0 0">Working title <b>Hallway Track</b>: a conference talk finder (Elasticsearch hybrid search) that is accessible by design, instrumented with Dash0, deployed on Kubernetes watched by Radar, with every change landing through a Gitar-reviewed PR. One codebase, five scoring angles.</p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">Read-out</div>
+      <div class="stat"><span>Top prize pool</span><b class="mono">$16,000 cash (4 × $4,000) + DGX Spark + iPad</b></div>
+      <div class="stat"><span>Team</span><b>Solo or any size, one submission</b></div>
+      <div class="stat"><span>Build minutes left</span><b class="mono" id="buildleft">--</b></div>
+      <div class="stat"><span>Submission platform</span><span class="pill p-hi">NOT FOUND</span></div>
+      <div class="stat"><span>Presentations</span><b class="mono">5:30–6:30 PM</b></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Time budget · now to submit</h2>
+  <div class="panel">
+    <div class="gantt" id="gantt"></div>
+    <div class="axis"><span>2:30</span><span>3:00</span><span>3:30</span><span>4:00</span><span>4:30</span><span>5:00</span><span>5:30</span></div>
+    <p style="font-size:12px;color:var(--mute);margin:8px 0 0">Orange line is now. Bars turn solid while active and green when their time has passed. Checks are saved in this browser only.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Roadblocks to clear now</h2>
+  <div class="grid g2" id="rbs"></div>
+</section>
+
+<section>
+  <h2>One project, every track</h2>
+  <div class="panel mx-wrap">
+    <table>
+      <thead><tr><th>Track</th><th>Prize</th><th>What the judges look for</th><th>How Hallway Track earns it</th></tr></thead>
+      <tbody>
+        <tr><td><b>Sonar</b><br>Never Merge Broken</td><td class="mono">$4,000</td><td>Features land via reviewed PRs, review rules file, CI failure auto-fix on a real problem</td><td>Every feature is a PR. Add a rules file. Break CI once on purpose and show Gitar fix it.</td></tr>
+        <tr><td><b>Dash0</b><br>Stop Flying Blind</td><td class="mono">$4,000</td><td>Traces, logs, metrics; Agent0 or MCP finds and fixes something real; dashboard or SLO bonus</td><td>OpenTelemetry on the API. Plant a slow query, find it with Agent0, fix it on camera. One SLO on search latency.</td></tr>
+        <tr><td><b>Radar</b><br>AI SRE</td><td class="mono">$4,000</td><td>Runs on Kubernetes with Radar connected; AI investigation of a real issue shown</td><td>Deploy to the cluster, point Radar at it, let it diagnose a crash-looping pod we cause.</td></tr>
+        <tr><td><b>Elasticsearch</b><br>Find the Right Talk</td><td class="mono">$4,000</td><td>Elasticsearch is the core data layer; smart keyword plus semantic or vector search</td><td>Hybrid query (BM25 + semantic_text) over 60 sessions. This is the product.</td></tr>
+        <tr><td><b>Merge Forward</b><br>Conferences for Everyone</td><td class="mono">iPad</td><td>Makes conferences more inclusive and accessible</td><td>Filters for captions, sign language, step-free rooms, quiet rooms. Keyboard and screen-reader clean.</td></tr>
+        <tr><td><b>Overall</b></td><td class="mono">DGX Spark</td><td>Best project from any track</td><td>A clear 3-minute demo that touches every sponsor tool for a real reason.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Architecture</h2>
+  <div class="panel" style="overflow-x:auto">
+    <svg viewBox="0 0 760 250" width="760" role="img" aria-label="Browser calls a Node API, which queries Elasticsearch and sends telemetry to Dash0. The API runs on Kubernetes watched by Radar. GitHub PRs are reviewed by Gitar.">
+      <rect class="b" x="10" y="95" width="120" height="60" rx="8"/><text x="70" y="122" text-anchor="middle">Browser UI</text><text class="s" x="70" y="140" text-anchor="middle">a11y filters</text>
+      <rect class="a" x="190" y="95" width="150" height="60" rx="8"/><text x="265" y="122" text-anchor="middle">Node API</text><text class="s" x="265" y="140" text-anchor="middle">TypeScript + OTel</text>
+      <rect class="a" x="420" y="20" width="150" height="60" rx="8"/><text x="495" y="47" text-anchor="middle">Elasticsearch</text><text class="s" x="495" y="65" text-anchor="middle">hybrid search</text>
+      <rect class="a" x="420" y="170" width="150" height="60" rx="8"/><text x="495" y="197" text-anchor="middle">Dash0</text><text class="s" x="495" y="215" text-anchor="middle">traces, SLO, Agent0</text>
+      <rect class="w" x="620" y="95" width="130" height="60" rx="8"/><text x="685" y="122" text-anchor="middle">Radar</text><text class="s" x="685" y="140" text-anchor="middle">watches cluster</text>
+      <rect class="b" x="190" y="195" width="150" height="45" rx="8"/><text x="265" y="215" text-anchor="middle">GitHub PRs</text><text class="s" x="265" y="231" text-anchor="middle">Gitar reviews</text>
+      <path class="l" d="M130 125H190"/><path class="l" d="M340 110L420 55"/><path class="l" d="M340 140L420 195"/><path class="l" d="M265 155V195"/><path class="l" d="M620 125H570" stroke-dasharray="4 3"/>
+      <rect x="170" y="85" width="190" height="80" rx="10" fill="none" stroke="var(--warn)" stroke-dasharray="5 4" stroke-width="1.5"/><text class="s" x="175" y="80" style="fill:var(--warn)">Kubernetes deployment</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <h2>Shortcuts available</h2>
+  <div class="grid g3">
+    <div class="panel"><span class="pill p-ok">SAVES ~40 MIN</span><p style="margin:8px 0 0">Seed data is generated, not scraped. 60 fictional sessions, one JSON file, written by a Haiku agent.</p></div>
+    <div class="panel"><span class="pill p-ok">SAVES ~25 MIN</span><p style="margin:8px 0 0">Elasticsearch <code>semantic_text</code> field does embeddings for us. No model hosting, no vector code.</p></div>
+    <div class="panel"><span class="pill p-ok">SAVES ~30 MIN</span><p style="margin:8px 0 0">Radar starter repo <code>skyhook-io/cnh-starter</code> and the shared cluster skip local cluster setup.</p></div>
+    <div class="panel"><span class="pill p-ok">SAVES ~20 MIN</span><p style="margin:8px 0 0">OpenTelemetry Node auto-instrumentation: env vars and one require flag, zero code per route.</p></div>
+    <div class="panel"><span class="pill p-ok">SAVES ~15 MIN</span><p style="margin:8px 0 0">Plain HTML/JS front end served by the API. No framework build step.</p></div>
+    <div class="panel"><span class="pill p-md">CUT FIRST</span><p style="margin:8px 0 0">Order of cuts if late: Dash0 SLO, then RUM, then sign-language filter polish. Never cut the PR flow or the demo.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Who does what</h2>
+  <div class="grid g2">
+    <div class="panel"><span class="who you">YOU</span><h3 style="margin-top:6px">Human-only</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Four account sign-ups (Gitar, Dash0, Radar, Elastic), Radar join code at the Radar table, ask organizers where to submit, start Docker, pitch and record the demo.</p></div>
+    <div class="panel"><span class="who">CLAUDE</span><h3 style="margin-top:6px">Orchestrator and builder</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Repo, API, search, UI, Dockerfile, k8s manifests, OTel wiring, PR flow, final verification. Reads Haiku output before using it.</p></div>
+    <div class="panel"><span class="who">HAIKU-R</span><h3 style="margin-top:6px">Research (running)</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Sponsor cheat sheet into <code>research/sponsors.md</code>: exact env vars, commands, gotchas.</p></div>
+    <div class="panel"><span class="who">HAIKU-W</span><h3 style="margin-top:6px">Writing (running, more queued)</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">60-session seed data now. Next: README with AI disclosure, demo script, Devpost-style description.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Rules that can disqualify us</h2>
+  <div class="grid g2">
+    <div class="panel"><span class="pill p-ok">OK</span> Code started after kickoff. Build window opened 11:00 AM, so a fresh repo now is compliant.</div>
+    <div class="panel"><span class="pill p-md">DO</span> Public repo plus README with setup steps. Disclose AI coding assistant use in the README.</div>
+    <div class="panel"><span class="pill p-md">DO</span> You must be able to explain the architecture and decisions. Read what Claude builds before presenting.</div>
+    <div class="panel"><span class="pill p-md">DO</span> No secrets, personal data or logins in the repo or demo. <code>.env</code> is already gitignored.</div>
+  </div>
+</section>
+
+<p class="foot">Sources: wemakedevs.org/hackathons/cnh (overview, schedule, rules, resources), read by a Haiku agent today. Environment checks (gh, docker, kubectl) run locally at 2:33 PM MT. Things marked NOT FOUND were absent from those pages.</p>
+</div>
+
+<script>
+// Times in minutes since midnight, Mountain Time (MST, UTC-7 on Nov 9 2026).
+var DEADLINE=new Date("2026-11-09T17:30:00-07:00").getTime();
+var AXIS0=14*60+30, AXIS1=17*60+30, SPAN=AXIS1-AXIS0;
+var PHASES=[
+ {n:"Unblock",s:14*60+35,e:14*60+50,tasks:[
+  ["Sign up: Elastic Serverless trial (ela.st/hack-kubecon), Dash0, Radar, Gitar","you"],
+  ["Start Docker Desktop; get Radar join code at the Radar table","you"],
+  ["Ask organizers where projects are submitted","you"],
+  ["Create public GitHub repo, push scaffold with .gitignore and README stub","claude"]]},
+ {n:"Core search",s:14*60+50,e:15*60+40,tasks:[
+  ["Index sessions.json into Elasticsearch with a semantic_text field","claude"],
+  ["Hybrid search endpoint: keyword plus semantic, accessibility filters","claude"],
+  ["Plain HTML UI: search box, filter chips, result cards","claude"],
+  ["Open feature 1 as a PR so Gitar reviews it","claude"]]},
+ {n:"Platform",s:15*60+40,e:16*60+20,tasks:[
+  ["Dockerfile and k8s manifests, deploy to cluster","claude"],
+  ["Connect Radar to the cluster, verify it sees the pods","you"],
+  ["OpenTelemetry to Dash0: traces and logs flowing","claude"],
+  ["Add Gitar rules file; push a deliberately failing CI run","claude"]]},
+ {n:"Inclusive + demo moments",s:16*60+20,e:16*60+50,tasks:[
+  ["Accessibility pass: keyboard, labels, contrast, captions filter","claude"],
+  ["Plant slow query, find it with Dash0 Agent0, fix it (demo moment)","claude"],
+  ["Crash a pod, capture Radar AI investigation (demo moment)","you"]]},
+ {n:"Docs + demo",s:16*60+50,e:17*60+15,tasks:[
+  ["README: setup, architecture, AI disclosure, track map","claude"],
+  ["Demo script, 3 minutes, one beat per sponsor","claude"],
+  ["Record or rehearse the demo","you"]]},
+ {n:"Submit buffer",s:17*60+15,e:17*60+30,tasks:[
+  ["Hard freeze. Final repo check from a clean clone","claude"],
+  ["Submit and screenshot the confirmation","you"]]}
+];
+var RB=[
+ {sev:"hi",t:"Submission platform is unknown",d:"The event pages name a 5:30 PM deadline but no Devpost or form link.",f:"Ask at the registration desk now. Fallback: public repo URL plus README, ready to hand over."},
+ {sev:"hi",t:"No Kubernetes cluster yet",d:"Checked at 2:33 PM: Docker daemon is not running, kubectl has no context, kind is not installed.",f:"Fastest: join the shared cluster at join.cnh.radarhq.io (code at the Radar table). Backup: start Docker, brew install kind."},
+ {sev:"hi",t:"Four sponsor accounts need a human",d:"Elastic, Dash0, Radar and Gitar sign-ups need your browser and email. Claude cannot do these.",f:"Do all four in parallel in the next 10 minutes. Paste API keys into .env only, never into chat or the repo."},
+ {sev:"md",t:"Gitar needs real PRs",d:"The Sonar track scores features landing through reviewed PRs. GitHub CLI is logged in as Dennesssy, so PRs are possible.",f:"Install the Gitar app on the new repo first, then branch per feature."},
+ {sev:"md",t:"Understand-your-code rule",d:"Rules 6 and 7 allow rejection of AI output you cannot explain.",f:"Reserve 10 minutes to read the code and rehearse. Disclose AI assistance in the README."},
+ {sev:"lo",t:"Event page inconsistencies",d:"Hero shows $0 prize pool; FAQ says breakfast at 10 versus 9. $4,000 of the $20,000 is unallocated on the page.",f:"Ignore. Confirm the pool at the desk only if you have spare minutes."}
+];
+var PILL={hi:["BLOCKS BUILD","p-hi"],md:["WATCH","p-md"],lo:["MINOR","p-lo"]};
+var store={};try{store=JSON.parse(localStorage.getItem("hb-checks")||"{}")}catch(e){}
+function save(){try{localStorage.setItem("hb-checks",JSON.stringify(store))}catch(e){}}
+function pad(n){return (n<10?"0":"")+n}
+function hm(m){var h=Math.floor(m/60);return (h>12?h-12:h)+":"+pad(m%60)}
+function mtMinutes(){var p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Denver",hour:"numeric",minute:"numeric",hour12:false}).formatToParts(new Date()),h=0,m=0;
+  p.forEach(function(x){if(x.type==="hour")h=+x.value%24;if(x.type==="minute")m=+x.value});return h*60+m}
+function build(){
+  var g=document.getElementById("gantt");g.innerHTML="";
+  PHASES.forEach(function(p,i){
+    var row=document.createElement("div");
+    var left=(p.s-AXIS0)/SPAN*100,w=(p.e-p.s)/SPAN*100;
+    row.innerHTML='<div class="ph-label"><b>'+p.n+'</b><span class="mono">'+hm(p.s)+'–'+hm(p.e)+' · '+(p.e-p.s)+' min</span><span class="mono" id="st'+i+'"></span></div>'+
+      '<div class="track"><div class="bar" id="bar'+i+'" style="left:'+left+'%;width:'+w+'%">'+(p.e-p.s)+'m</div><div class="nowline" id="now'+i+'"></div></div>';
+    var d=document.createElement("details");if(i<2)d.open=true;
+    var s=document.createElement("summary");s.textContent="Tasks ("+p.tasks.length+")";d.appendChild(s);
+    var ul=document.createElement("ul");ul.className="tasks";
+    p.tasks.forEach(function(t,j){var k=i+"-"+j,li=document.createElement("li"),lb=document.createElement("label"),cb=document.createElement("input");
+      cb.type="checkbox";cb.id="t"+k;cb.checked=!!store[k];cb.onchange=function(){store[k]=cb.checked;save()};
+      var sp=document.createElement("span");sp.textContent=t[0];var w2=document.createElement("span");w2.className="who "+(t[1]==="you"?"you":"");w2.textContent=t[1].toUpperCase();
+      lb.appendChild(cb);lb.appendChild(sp);lb.appendChild(w2);li.appendChild(lb);ul.appendChild(li)});
+    d.appendChild(ul);row.appendChild(d);g.appendChild(row)});
+  var r=document.getElementById("rbs");RB.forEach(function(b){var c=document.createElement("div");c.className="panel rb";
+    c.innerHTML='<div><span class="pill '+PILL[b.sev][1]+'">'+PILL[b.sev][0]+'</span></div><h3>'+b.t+'</h3><p>'+b.d+'</p><p class="fix"><b>Fix:</b> '+b.f+'</p>';r.appendChild(c)});
+}
+function tick(){
+  var ms=DEADLINE-Date.now(),neg=ms<0;if(neg)ms=0;
+  var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sc=s%60;
+  document.getElementById("count").textContent=pad(h)+":"+pad(m)+":"+pad(sc);
+  var now=mtMinutes();
+  document.getElementById("clocknow").textContent="now "+hm(now)+" "+(now>=720?"PM":"AM")+" MT";
+  var freeze=17*60+15;document.getElementById("buildleft").textContent=Math.max(0,freeze-now)+" min to freeze";
+  document.getElementById("meter").style.width=Math.min(100,Math.max(0,(now-(11*60))/(17*60+30-11*60)*100))+"%";
+  PHASES.forEach(function(p,i){
+    var bar=document.getElementById("bar"+i),st=document.getElementById("st"+i),nl=document.getElementById("now"+i);
+    bar.className="bar"+(now>=p.e?" done":(now>=p.s?" cur":""));
+    st.textContent=now>=p.e?"DONE WINDOW":(now>=p.s?"ACTIVE NOW":"");
+    var pos=(now-AXIS0)/SPAN*100;nl.style.left=Math.min(100,Math.max(0,pos))+"%";
+  });
+}
+build();tick();setInterval(tick,1000);
+</script>
