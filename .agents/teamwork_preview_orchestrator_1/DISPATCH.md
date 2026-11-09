@@ -17,13 +17,19 @@ Use the Agent tool with `subagent_type: "general-purpose"` and an explicit `mode
 Never write/edit source code, never run build/test commands, never investigate at code level — Explorers and Workers do that. Edit only .md files inside .agents/. Auditor INTEGRITY VIOLATION is an absolute veto.
 
 ## Environment facts (verified by Sentinel at 15:01 MT)
-- Node v22.17.0; `node --experimental-strip-types` works; `node --test` available. npm works; @elastic/elasticsearch latest = 9.5.1; playwright latest = 1.65.0 (no browsers cached yet).
+- Node v22.17.0; `node --experimental-strip-types` works; `node --test` available. npm works; @elastic/elasticsearch latest = 9.5.1; (Playwright is NOT used in this project — user instruction 15:25.)
 - OrbStack running (docker available via OrbStack context). Kubernetes NOT enabled in OrbStack; kubectl has no context.
 - No .env yet: no Elastic/Dash0 credentials. gh CLI logged in as Dennesssy. Repo is a local git repo on `main`, not pushed.
 - Git hygiene: Workers commit their own verified work on `main` (one milestone = one or more commits), commit trailer: `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Never push.
 
 ## Actions that need the user (escalate to Sentinel via handoff, never do them)
 Push/create GitHub repo, PRs, GitHub app installs, API keys, account sign-ups, enabling OrbStack Kubernetes or other system config.
+
+## Additional user instructions (15:06–15:08 MT, verbatim)
+- "with browser os NEO tot est" → UI testing MUST include a live test pass driven through **BrowserOS neo** (skill: /Users/denn/.claude/skills/browseros-neo/SKILL.md; MCP endpoint http://127.0.0.1:9010/mcp). At 15:08 its MCP was NOT reachable (ECONNREFUSED). The skill forbids silently falling back to another browser tool: if a Worker cannot reach BrowserOS neo, it must write a Soft handoff naming the blocker so Sentinel asks the user to start it. UPDATE 15:25 MT (user): NO Playwright anywhere. BrowserOS neo is the only UI test browser. CI runs typecheck + server tests only.
+- "again files belong in directory" → every file any agent creates lives inside /Users/denn/Hackathon-Slc (state under .agents/, code in the repo). Never write to /tmp, /private/tmp or other system temp dirs.
+- "readme, push to git" → README.md exists (stub, commit 9ae6d15); the R8 Worker completes it. Pushing: the user asked for it, but the harness permission check denied creating/pushing the GitHub repo at 15:08. Sentinel is handling that with the user. Workers: commit locally only; do not attempt to push or create repos. Once origin exists Sentinel will tell you.
+- Already done by Sentinel, do not redo: research/perksmix-ref/ is untracked + gitignored (reference only).
 
 ## Objectives
 1. Initialize BRIEFING.md, progress.md, plan.md.

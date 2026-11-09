@@ -91,7 +91,7 @@ Guards (required):
 - `prefers-reduced-motion: reduce` disables all of the above (the existing global rule stays), and the JS skips View Transitions and FLIP when `matchMedia('(prefers-reduced-motion: reduce)').matches`.
 - Budget: no animation longer than 300 ms on a user action; no layout-property animation; a `PerformanceObserver` for `longtask` logs any task over 50 ms to the console (and to telemetry if M4 exposes a browser hook).
 - Do not depend on Safari Technology Preview "Testable" flags (Web Animations custom effects / custom frame rate); judges will not have them.
-- Test in Chromium and WebKit (Playwright) because View Transitions and scroll timelines differ most between engines.
+- Test in BrowserOS neo (the only UI test browser). Also open the page once by hand in Safari, because View Transitions and scroll timelines differ most between engines.
 
 ## 5. Visual system
 
@@ -115,4 +115,4 @@ Keep the AA-verified tokens from PROJECT.md (light/dark). Additions:
 - [ ] `?demo=1` slow toggle works; hidden without it
 - [ ] All motion is transform/opacity only, feature-detected, and off under reduced motion
 - [ ] No horizontal scroll at 390 px; zero serious/critical axe violations light + dark
-- [ ] Playwright passes in Chromium and WebKit; one live BrowserOS neo walkthrough recorded in the test report
+- [ ] BrowserOS neo walkthrough passes and is recorded in the test report (steps, screenshots, results)

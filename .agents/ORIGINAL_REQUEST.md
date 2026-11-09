@@ -37,7 +37,7 @@ UI spec the user already approved (from conversation):
 ### R1. Server — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
 ### R2. Server tests — real automated tests; Elasticsearch integration tests run when credentials exist and are reported SKIPPED (never passed) otherwise.
 ### R3. Web UI — per the approved spec above, optimized for hackathon judging.
-### R4. UI tests — automated browser tests incl. accessibility scan, keyboard flow, phone width, light+dark.
+### R4. UI tests — run through **BrowserOS neo only** (user, 15:25: "u still have play wright in the instructions"). NO Playwright, no other browser automation. Covers accessibility scan, keyboard flow, phone width, light+dark, and DESIGN.md section 7. How to open/use/close neo: docs/REQUIREMENTS.md.
 ### R5. Observability — OpenTelemetry traces/logs/metrics exportable to Dash0 via env config (Dash0 track).
 ### R6. Container + Kubernetes — Dockerfile and manifests with health probes, secrets via k8s Secret (Radar track).
 ### R7. CI + review — GitHub Actions running typecheck + tests; Gitar review configuration (Sonar track).
@@ -50,7 +50,7 @@ UI spec the user already approved (from conversation):
 - [ ] health, search, facets endpoints behave per PROJECT.md contract, incl. 400 on bad params
 - [ ] Elastic backend issues real ES requests (keyword + semantic) and fuses results; nothing hardcoded
 ### UI
-- [ ] UI test command exits 0; zero serious/critical axe violations in light and dark
+- [ ] BrowserOS neo test pass recorded (steps, screenshots, results) with zero serious/critical accessibility violations in light and dark
 - [ ] keyboard-only search + filtering works; result count announced via aria-live
 - [ ] no horizontal scroll at 390px width
 - [ ] match chip, latency, commit/pod footer render from real API responses
@@ -58,7 +58,7 @@ UI spec the user already approved (from conversation):
 - [ ] app starts with OTel enabled and emits spans (verified with a local exporter)
 - [ ] docker image builds and container serves /healthz
 - [ ] k8s manifests validate (client-side dry run at minimum)
-- [ ] CI workflow file runs the same commands that pass locally
+- [ ] CI workflow file runs the same commands that pass locally (typecheck + server tests; UI tests are neo-only and run locally, not in CI)
 ### Docs
 - [ ] BUILD.md + README commands are exactly the ones that work in this repo
 - [ ] no secrets committed; .env.example lists variable names only
