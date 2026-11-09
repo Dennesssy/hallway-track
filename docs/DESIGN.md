@@ -1,0 +1,118 @@
+# Hallway Track: design
+
+What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the existing `web/` (M2) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`.
+
+No design guarantees a win. Every item below is tied to a written judging criterion from `docs/EVENT.md`, so each one is a point a judge can tick.
+
+## 1. Prizes → criteria → feature → demo beat
+
+| Prize | Judges score | Feature that scores it | Demo beat (≤30 s each) |
+|---|---|---|---|
+| Elasticsearch, $4k | ES is the core; smart keyword + semantic/hybrid | **Match chips** (keyword / semantic / both) on every card; **"Show the query"** drawer with the real ES request and per-path hit counts | Type "talks for people new to tracing": a card marked *semantic* that keyword search alone would miss |
+| Dash0, $4k | Depth of traces/logs/metrics; Agent0/MCP fixes something real; dashboard/SLO bonus | **Ops strip**: latency of each search, sparkline of the last 20, `trace_id` with copy button, SLO badge (p95 under 300 ms) | Press the slow demo toggle, the sparkline spikes and the SLO badge turns amber; copy trace id, show it in Dash0, fix, back to green |
+| Radar, $4k | Runs on k8s with Radar; AI investigation of a real issue | **Pod + commit footer** from `/api/meta`; footer shows which pod answered each request | Kill a pod; the footer's pod name changes on the next search; Radar's investigation on screen |
+| Sonar, $4k | Features land via reviewed PRs; CI fix on a real failure | **Build badge** in the footer: commit sha linking to the PR that shipped it | Show a PR where Gitar caught and fixed a broken test |
+| Merge Forward, iPad | Makes conferences more inclusive and accessible | **"My needs" profile**: pick access needs once, they apply to every search and are remembered; per-card access row in words, not only icons | Keyboard-only run: `/` to search, Tab through filters, screen reader announces "12 talks found" |
+| Overall, DGX Spark | Best project | All of the above in one coherent story, polished motion, zero broken states | The whole 3-minute script in section 6 |
+
+## 2. Features by priority
+
+**P0, exists or in progress (M1/M2):** hybrid search, track/level/day filters, 5 access filters, result cards with highlights, loading/empty/error states, aria-live count, light/dark, 390 px layout.
+
+**P1, add now (highest win value per minute):**
+1. Match chip on each card (`result.match`). Already in the API.
+2. Ops strip: `latency_ms`, sparkline of the last 20 searches (kept in memory), `trace_id` + copy, SLO badge computed client-side from the last 20 latencies (p95 < 300 ms = green, else amber).
+3. "My needs" profile: a chip row above results; saved in `localStorage` (try/catch); applied as filters.
+4. Footer: `/api/meta` commit, pod, backend, semantic mode; pod name updates on every response (header or meta call).
+5. Slow-demo toggle visible only with `?demo=1` (sends `slow=true`).
+6. "Show the query" drawer: the request URL and response summary (backend, per-path counts, latency). With the Elastic backend, also show the query body if the API exposes it (needs an M1 addition; skip if not exposed, never fake it).
+7. Keyboard: `/` focuses search, `Esc` clears, arrow keys move between cards, focus ring always visible.
+
+**P2, only if P1 is done and gated:** "Build my day" list with clash detection; share link (`#q=` is fine outside artifacts); print stylesheet.
+
+**Out:** accounts, maps, calendar export, any front-end framework or build step.
+
+## 3. Layout
+
+Desktop (≥ 1024 px): three zones, search always on top.
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│ Hallway Track            [ / Search talks, e.g. "intro to tracing" ]  │ ← condenses on scroll
+│ My needs: (Captions ✓) (Step-free ✓) (+ add)                          │
+├──────────────┬──────────────────────────────────────┬────────────────┤
+│ FILTERS      │ 12 talks found                        │ OPS            │
+│ Track  ▾     │ ┌──────────────────────────────────┐ │ 38 ms          │
+│ Level  ▾     │ │ Title            [semantic]      │ │ ▁▂▁▃▁▁█▁ spark │
+│ Day 1 2 3    │ │ Speaker · Track · Level          │ │ SLO p95 ● ok   │
+│ Access needs │ │ Day 1 · 10:30 · Room B · 40 min  │ │ trace 4f2a… ⧉  │
+│ ☐ Captions   │ │ abstract with <mark>terms</mark> │ │ [Show query]   │
+│ ☐ Sign lang. │ │ Captions: yes · Step-free: yes … │ │                │
+│ ☐ Step-free  │ └──────────────────────────────────┘ │                │
+│ ☐ Quiet room │ (cards…)                              │                │
+│ ☐ Alt text   │                                       │                │
+├──────────────┴──────────────────────────────────────┴────────────────┤
+│ commit 62fd2c8 (PR #3) · pod hallway-7c9d · backend elastic · v0.1    │
+└───────────────────────────────────────────────────────────────────────┘
+```
+Phone (390 px): one column. Filters and ops collapse into `<details>` panels; ops shows a one-line summary (latency + SLO dot) when collapsed.
+```
+┌──────────────────────────┐
+│ Hallway Track            │
+│ [ Search talks…        ] │
+│ (Captions ✓)(Step-free ✓)│
+│ ▸ Filters (2)            │
+│ ▸ Ops · 38 ms · ● ok     │
+│ 12 talks found           │
+│ ┌──────────────────────┐ │
+│ │ Title     [semantic] │ │
+│ │ …                    │ │
+│ └──────────────────────┘ │
+│ commit · pod · backend   │
+└──────────────────────────┘
+```
+Rules: 44 px targets; text stays ≤ 70 ch; cards share edges and inner padding; match chip always top-right of the card; tabular numbers in the ops strip.
+
+## 4. Motion: threaded and web animations
+
+Goal: visible craft without hurting accessibility or speed. Every animation below moves only `transform` and `opacity`, which browsers run on the compositor thread ("threaded"), so motion stays smooth even while JavaScript is busy rendering results.
+
+| Moment | Technique | Detail |
+|---|---|---|
+| Results replace on a new search | **View Transitions API** (`document.startViewTransition`) | Old list fades and slides up 8 px, new list in. Each card gets `view-transition-name: card-<id>` so cards present in both lists glide to their new spot. |
+| Filters re-order the list | **Web Animations API**, FLIP | Measure card rects before and after the DOM update, then `el.animate([{transform: translate(dx,dy)}, {transform: none}], {duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)'})`. Cards that leave fade out, new ones fade in. |
+| Header condenses on scroll | **CSS scroll-driven animation** (`animation-timeline: scroll()`) | Title scales to 0.85 and the needs row tucks under the search box. Runs on the compositor ("Threaded Scroll-driven Animations" is a Stable, on-by-default flag in this Mac's Safari Technology Preview 27.0). |
+| Cards as they scroll in | **CSS `animation-timeline: view()`** | Subtle 6 px rise. The resting state is fully visible; the animation only starts from it, so nothing is hidden if the timeline is unsupported. |
+| New latency sample | **WAAPI + SVG** | Sparkline's newest point draws in with `stroke-dashoffset`; SLO dot crossfades green↔amber. |
+| Match chip | **WAAPI**, one pulse on first render | Scale 1 → 1.06 → 1, 300 ms, once. |
+| Loading | Existing skeleton pulse | Keep; opacity only. |
+
+Guards (required):
+- Feature detection: `'startViewTransition' in document`, `CSS.supports('animation-timeline: scroll()')`, `'animate' in Element.prototype`. Without support, update instantly; never break.
+- `prefers-reduced-motion: reduce` disables all of the above (the existing global rule stays), and the JS skips View Transitions and FLIP when `matchMedia('(prefers-reduced-motion: reduce)').matches`.
+- Budget: no animation longer than 300 ms on a user action; no layout-property animation; a `PerformanceObserver` for `longtask` logs any task over 50 ms to the console (and to telemetry if M4 exposes a browser hook).
+- Do not depend on Safari Technology Preview "Testable" flags (Web Animations custom effects / custom frame rate); judges will not have them.
+- Test in Chromium and WebKit (Playwright) because View Transitions and scroll timelines differ most between engines.
+
+## 5. Visual system
+
+Keep the AA-verified tokens from PROJECT.md (light/dark). Additions:
+- Match chips: `keyword` = outline, `semantic` = filled accent, `both` = filled accent + outline. Text label always present (state not by color alone).
+- SLO dot: green/amber with the word "ok"/"slow" next to it.
+- One accent color; semantic colors only for status.
+
+## 6. Three-minute demo script (UI beats)
+
+1. 0:00 Problem: "Finding the right talk is hard, and harder if you need captions or a step-free room."
+2. 0:20 Set "My needs": Captions + Step-free. Search "intro to tracing". Point at a *semantic* chip (Elasticsearch).
+3. 0:50 Keyboard-only: `/`, Tab, arrows; screen reader count (Merge Forward).
+4. 1:20 `?demo=1`, slow toggle: sparkline spikes, SLO amber; copy trace id, open in Dash0, show Agent0 finding (Dash0).
+5. 2:00 Kill a pod; footer pod changes; Radar investigation (Radar).
+6. 2:30 Footer commit → PR with Gitar review and CI fix (Sonar).
+7. 2:50 Close: one sentence on why this makes conferences easier for everyone.
+
+## 7. Acceptance checks for this design
+- [ ] Match chip, ops strip, SLO badge, trace id copy, My needs, footer pod/commit all render from real API data
+- [ ] `?demo=1` slow toggle works; hidden without it
+- [ ] All motion is transform/opacity only, feature-detected, and off under reduced motion
+- [ ] No horizontal scroll at 390 px; zero serious/critical axe violations light + dark
+- [ ] Playwright passes in Chromium and WebKit; one live BrowserOS neo walkthrough recorded in the test report
