@@ -18,7 +18,7 @@ Integrity mode: development
 - /Users/denn/Hackathon-Slc/research/sponsors.md — sponsor integration notes (several items marked unconfirmed)
 - /Users/denn/Hackathon-Slc/data/sessions.json — 60 fictional sessions (seed data)
 - /Users/denn/Hackathon-Slc/plans/board.html — time plan
-- research/perksmix-ref/ — REFERENCE ONLY, must not be shipped (pre-existing code violates rule 8)
+- research/perksmix-ref/ — local scratch copy, gitignored, not shipped. The shipped starter is swift-server/ (R0).
 
 Event: Cloud Native Hackathon, Salt Lake City. Submission 17:30 MT, hard freeze 17:15 MT. User goal: WIN (overall + all sponsor tracks + Merge Forward). Every sponsor track also scores "how well the project makes conferences easier".
 Hackathon rules that bind this build: code is original work done today; public repo + README with setup; AI assistance disclosed; user must be able to explain the code; no secrets or personal data in repo/demo.
