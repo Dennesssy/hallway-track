@@ -25,6 +25,31 @@ Known unverified: EIS/Jina availability on trial; must be reported UNVERIFIED, n
 | F9 | GitHub Actions CI + Gitar config (.gitar/review, .gitar/config; NO .gitar.yml) | M6 |
 | F10 | BUILD.md, README, .env.example | M7 |
 
+
+## MILESTONES (SWIFT + HTMX, FULL SCOPE): this table replaces the Node-era table further down
+Gate for every milestone = full roster (Worker, 2 Reviewers, 2 Challengers, 1 Forensic Auditor). Each Worker owns the listed paths only. "Human" tasks are done by the user, tracked in STATE.md.
+
+| # | Milestone | Scope (see ORIGINAL_REQUEST.md) | Write ownership | Depends on | Verify |
+|---|---|---|---|---|---|
+| S0 | Starter import | done: d127f28 | swift-server/ (unmodified) | none | `swift build` passed |
+| S1 | Trim starter + NIO core | remove login/chat/perks/GRDB/crypto; NIOHTTP1 router, static files, security headers, /healthz /readyz /api/meta; Vapor fallback decision at 16:10 | swift-server/Package.swift, Sources/App/{App,Router,Http,Config}.swift | S0 | `swift build`; curl /healthz |
+| S2 | Search engine | Elastic backend via AsyncHTTPClient (mapping, bulk index, hybrid+RRF, reranker, multilingual, intent), in-memory fallback, indexer CLI | Sources/App/Search/**, Sources/Indexer/** | S1; Elastic key (human) | `swift test`; ES tests SKIPPED without creds |
+| S3 | HTMX UI + design | DESIGN.md sections 2-5, 8, 9; COPY.md; fragments /ui/*; vendored htmx | swift-server/Public/**, Sources/App/Views/** | S1 (S2 for live data) | renders; neo smoke |
+| S4 | Accessibility build | JS-off path, forced-colors/high-contrast, 200% zoom, dyslexia option, reduced motion | Public/** (CSS/HTML only) | S3 | checklist items implemented |
+| S5 | UI tests + a11y proof | BrowserOS neo passes; docs/ACCESSIBILITY.md; Human: VoiceOver pass | tests/ui/**, docs/ACCESSIBILITY.md | S3,S4 | recorded neo results |
+| S6 | Relevance suite + gate | eval/queries.json, runner, REPORT.md, CI gate | eval/**, Tests/** | S2 | MRR/nDCG table; degraded ranking fails |
+| S7 | Observability | OTel traces/logs/metrics, RUM, SLO/dashboard/alerts as files, synthetic, Dash0 operator | Sources/App/Telemetry/**, deploy/dash0/** | S1; Dash0 account (human) | spans in Dash0 |
+| S8 | Container + platform | Dockerfile (no SQLite), k8s (probes, HPA, PDB), Argo CD app, Radar connect | Dockerfile, deploy/k8s/**, deploy/argocd/** | S1 | image serves /healthz; Argo Synced |
+| S9 | Faults + runbooks | slow query, crash loop, bad deploy, ES outage; runbooks | Sources/App/Faults.swift, docs/runbooks/** | S2,S7,S8 | each reproduced once |
+| S10 | CI + Gitar | GitHub Actions (swift build/test, relevance gate), `.gitar/review/*`, auto-apply | .github/**, .gitar/** | S1,S6; repo + Gitar app (human) | green run; failing run auto-fixed |
+| S11 | Incident loop | R13 end to end, recorded | docs/demo/** | S7,S8,S9,S10 | evidence files |
+| S12 | Docs + understanding | BUILD.md, README, demo script, EXPLAIN.md outline (human answers) | BUILD.md, README.md, EXPLAIN.md, docs/DEMO.md | all | commands copy-paste correct |
+| S13 | Experiment | WebGPU check + on-device re-rank (R9) | Public/experiments/** | S3 | capability states correct; core unaffected |
+
+Waves: W1 = S1 || S3(static) ; W2 = S2 || S4 || S8 || S7 ; W3 = S5 || S6 || S9 || S10 ; W4 = S11 ; W5 = S12, S13. Human tasks in parallel from now: accounts and keys, repo, VoiceOver, EXPLAIN answers.
+
+(Node-era table below is obsolete.)
+
 ## Milestones
 | # | Name | Scope | Deps | Status |
 |---|---|---|---|---|

@@ -49,6 +49,46 @@ UI spec the user already approved (from conversation):
 ### R3a. HTMX front end (user, 15:28: "the front end needs to be HTMX; bc perkmix was htmx")
 The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN dependency at the venue). The server renders HTML fragments (cards, counts, ops strip) that htmx swaps in; JSON API stays for tests/integrations. Server-side HTML escaping on every value. Minimal custom JS only where htmx cannot do it (WAAPI FLIP, sparkline). Use htmx View Transitions (`transition:true`) for the DESIGN.md motion plan. PerksMix is the disclosed starter template (R0); new HTMX code is written today and PerksMix databases, data and secrets are never imported. The earlier vanilla-JS UI (commit 2885473) is superseded and removed from the tree.
 ### R9. Optional experiment (user, "can we add browser check to check for webgppu and offer to run ... client side just for fun"): WebGPU capability check plus an opt-in on-device re-rank of results with a small ONNX text-embedding model. Spec: docs/DESIGN.md section 10; copy: docs/COPY.md. Lowest priority; only after the four must-have demo moments pass; core search must work with it off.
+
+## Full scope (user 16:0x: "i didnt tell you to leave it out, include everything needed")
+Everything below is REQUIRED, not optional, except R9 (marked experiment). Time is not a reason to drop an item; if the schedule cannot hold, report to Sentinel and the user decides. Items marked VERIFY need a real check on the user's accounts before building on them; never assume.
+
+### R10. Search quality (Elasticsearch track)
+- Hybrid retrieval: BM25 + `semantic_text` (Jina via Elastic Inference Service), fused with RRF.
+- Reranker (Jina reranker through EIS) on the top candidates. VERIFY availability on the trial; fall back to RRF-only and say so in the UI and README.
+- Multilingual search: a query in Spanish (and at least one more language) finds English talks. Sessions get `lang` metadata. VERIFY the model used is multilingual.
+- Plain-language intent: "I use a wheelchair", "I'm new to this", "talks with captions" map to filters (step_free_room, level beginner, captions) through Elastic Agent Builder or an MCP tool, with the interpreted filters shown to the user and removable. VERIFY Agent Builder/MCP access.
+- Relevance suite: `eval/queries.json` with about 40 labelled queries (English, Spanish, plain-language intent), a runner reporting MRR and nDCG@10 for keyword, semantic, hybrid and reranked, written to `eval/REPORT.md` with a chart.
+- CI relevance gate: a pull request fails if hybrid MRR drops below the committed baseline. Runs in CI against the in-memory backend and, when credentials exist, against Elasticsearch.
+
+### R11. Observability depth (Dash0 track)
+- Traces, logs and metrics from the server; span per backend call (keyword, semantic, rerank).
+- Real-user monitoring from the HTMX pages (page load, search latency as seen by the browser). VERIFY Dash0 RUM setup for a non-SPA page.
+- A real SLO on search latency, dashboards and alert rules kept as files in the repo (`deploy/dash0/`), applied with the Dash0 CLI or API. VERIFY format.
+- Synthetic monitoring of the search page.
+- Dash0 operator installed on the cluster. VERIFY install steps.
+- Dash0 MCP server connected to the coding assistant and used for the incident loop.
+
+### R12. Platform and operations (Radar track)
+- Kubernetes manifests with liveness/readiness probes, resource requests/limits, HorizontalPodAutoscaler, PodDisruptionBudget, secrets via k8s Secret.
+- Argo CD deploys from the repo (every push deploys, as the Radar starter does). Use `skyhook-io/cnh-starter` structure as reference.
+- Radar connected to the cluster (event cluster or OrbStack), Radar MCP added to the coding assistant.
+- Deliberate failure scenarios, each with a runbook in `docs/runbooks/`: slow query, crash loop (bad env), bad deploy (failing readiness), dependency outage (Elasticsearch unreachable, app falls back and says so). Each is triggerable by a documented flag or manifest and each is investigated in Radar.
+
+### R13. Closed incident loop (cross-track centerpiece)
+Slow query in the deployed app -> Dash0 (Agent0 or MCP) identifies the slow span -> fix opened as a pull request -> Gitar reviews and diagnoses a failing CI check, auto-apply pushes the fix -> Argo CD rolls out -> Radar investigation and rollout checks show recovery -> UI ops strip returns to normal. The injected fault is labelled as injected in the README. Every step must really happen and be recorded (screenshots or a short screen recording) in `docs/demo/`.
+
+### R14. Accessibility proof (Merge Forward)
+- WCAG 2.2 AA checklist with a recorded result for every criterion that applies, in `docs/ACCESSIBILITY.md`.
+- Works with JavaScript off (search form, filters, results).
+- Forced-colors and high-contrast modes, reduced motion, text resizing to 200% without loss, a dyslexia-friendly type option (font and spacing toggle, remembered on the device).
+- Keyboard-only run of every flow; focus visible; no keyboard traps.
+- A real VoiceOver pass on search, filters and results (human task, results recorded in `docs/ACCESSIBILITY.md`).
+- Plain-language copy per `docs/COPY.md`.
+
+### R15. Evidence of understanding (rule 6/7)
+`EXPLAIN.md`: the human team member explains, in their own words, each layer (search, CI gate, observability, platform, accessibility, incident loop): what it does, why, and how to demo it. AI agents create only the outline and questions; the answers are the human's. Rehearse the demo from it.
+
 ### R4. UI tests — run through **BrowserOS neo only** (user, 15:25: "u still have play wright in the instructions"). NO Playwright, no other browser automation. Covers accessibility scan, keyboard flow, phone width, light+dark, and DESIGN.md section 7. How to open/use/close neo: docs/REQUIREMENTS.md.
 ### R5. Observability — OpenTelemetry traces/logs/metrics exportable to Dash0 via env config (Dash0 track).
 ### R6. Container + Kubernetes — Dockerfile and manifests with health probes, secrets via k8s Secret (Radar track).
@@ -79,3 +119,11 @@ The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN depend
 - Creating/pushing a public GitHub repo, opening PRs, installing GitHub apps
 - Entering or reading API keys; sponsor account sign-ups
 - Changing OrbStack/system config (e.g. enabling Kubernetes)
+
+### Added acceptance criteria (full scope)
+- [ ] R10: reranker VERIFIED or documented fallback; Spanish query returns at least one correct English talk; intent examples map to the right filters; `eval/REPORT.md` exists with MRR/nDCG for four modes; CI fails a deliberately degraded ranking
+- [ ] R11: spans for each backend call visible in Dash0; RUM events arriving; SLO, dashboard and alert files in repo and applied; synthetic check passing; operator pods running
+- [ ] R12: `kubectl get` shows probes, HPA and PDB; Argo CD app Synced/Healthy; Radar sees the workload; four runbooks each reproduced once and recorded
+- [ ] R13: the full loop executed once with evidence in `docs/demo/`
+- [ ] R14: `docs/ACCESSIBILITY.md` has every applicable WCAG 2.2 AA criterion marked pass/fail with evidence; JS-off, forced-colors, 200% zoom, dyslexia option and VoiceOver results recorded
+- [ ] R15: `EXPLAIN.md` answers written by the human (verified by asking the user, not by an agent)
