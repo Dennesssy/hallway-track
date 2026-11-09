@@ -72,13 +72,29 @@ Phone (390 px): one column. Filters and ops collapse into `<details>` panels; op
 ```
 Rules: 44 px targets; text stays ≤ 70 ch; cards share edges and inner padding; match chip always top-right of the card; tabular numbers in the ops strip.
 
+## 3a. Rendering model: HTMX
+
+The front end is **htmx 2.x**, served from `web/vendor/htmx.min.js` (vendored so the demo works on bad venue wifi). The server renders HTML; htmx swaps it.
+
+| Interaction | htmx wiring | Server response |
+|---|---|---|
+| Typing in search | `<input name="q" hx-get="/ui/results" hx-trigger="input changed delay:250ms, search" hx-target="#results" hx-include="#filters" hx-swap="innerHTML transition:true" hx-indicator="#loading">` | Fragment: result cards + count line |
+| Changing a filter | `<form id="filters" hx-get="/ui/results" hx-trigger="change" hx-target="#results" hx-swap="innerHTML transition:true">` | Same fragment |
+| Ops strip update | Server sends `HX-Trigger: {"search-done": {"latency_ms":…, "trace_id":…, "pod":…}}`; a small script listens for `search-done` and updates the sparkline and SLO badge | Header only |
+| Count announcement | Count line lives in an `aria-live="polite"` region that htmx updates via `hx-swap-oob` | Out-of-band fragment |
+| Show the query | `hx-get="/ui/query?…"` into a `<dialog>` | Fragment |
+| Footer pod/commit | `hx-get="/ui/meta" hx-trigger="load, search-done from:body"` | Fragment |
+| Slow demo toggle | `?demo=1` shows a checkbox named `slow` inside `#filters` | – |
+
+Rules: every value is HTML-escaped on the server (only `<mark>` survives in highlights); URLs stay shareable with `hx-push-url="true"`; without JavaScript the search form still submits to `/` and the server renders the full page (progressive enhancement); focus never moves while typing.
+
 ## 4. Motion: threaded and web animations
 
 Goal: visible craft without hurting accessibility or speed. Every animation below moves only `transform` and `opacity`, which browsers run on the compositor thread ("threaded"), so motion stays smooth even while JavaScript is busy rendering results.
 
 | Moment | Technique | Detail |
 |---|---|---|
-| Results replace on a new search | **View Transitions API** (`document.startViewTransition`) | Old list fades and slides up 8 px, new list in. Each card gets `view-transition-name: card-<id>` so cards present in both lists glide to their new spot. |
+| Results replace on a new search | **View Transitions API** via htmx `hx-swap="… transition:true"` (htmx calls `document.startViewTransition`) | Old list fades and slides up 8 px, new list in. Each card gets `view-transition-name: card-<id>` so cards present in both lists glide to their new spot. |
 | Filters re-order the list | **Web Animations API**, FLIP | Measure card rects before and after the DOM update, then `el.animate([{transform: translate(dx,dy)}, {transform: none}], {duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)'})`. Cards that leave fade out, new ones fade in. |
 | Header condenses on scroll | **CSS scroll-driven animation** (`animation-timeline: scroll()`) | Title scales to 0.85 and the needs row tucks under the search box. Runs on the compositor ("Threaded Scroll-driven Animations" is a Stable, on-by-default flag in this Mac's Safari Technology Preview 27.0). |
 | Cards as they scroll in | **CSS `animation-timeline: view()`** | Subtle 6 px rise. The resting state is fully visible; the animation only starts from it, so nothing is hidden if the timeline is unsupported. |

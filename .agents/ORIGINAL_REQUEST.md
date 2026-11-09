@@ -37,6 +37,8 @@ UI spec the user already approved (from conversation):
 ### R1. Server — API + Elasticsearch hybrid search, with a clearly labelled in-memory fallback backend for offline/dev/tests; indexer script for data/sessions.json.
 ### R2. Server tests — real automated tests; Elasticsearch integration tests run when credentials exist and are reported SKIPPED (never passed) otherwise.
 ### R3. Web UI — per the approved spec above, optimized for hackathon judging.
+### R3a. HTMX front end (user, 15:28: "the front end needs to be HTMX; bc perkmix was htmx")
+The web UI is built with **htmx 2.x** (vendored under web/vendor/, no CDN dependency at the venue). The server renders HTML fragments (cards, counts, ops strip) that htmx swaps in; JSON API stays for tests/integrations. Server-side HTML escaping on every value. Minimal custom JS only where htmx cannot do it (WAAPI FLIP, sparkline). Use htmx View Transitions (`transition:true`) for the DESIGN.md motion plan. Do NOT copy PerksMix code (rule 8); same approach, new code. The earlier vanilla-JS UI (commit 2885473) is superseded.
 ### R4. UI tests — run through **BrowserOS neo only** (user, 15:25: "u still have play wright in the instructions"). NO Playwright, no other browser automation. Covers accessibility scan, keyboard flow, phone width, light+dark, and DESIGN.md section 7. How to open/use/close neo: docs/REQUIREMENTS.md.
 ### R5. Observability — OpenTelemetry traces/logs/metrics exportable to Dash0 via env config (Dash0 track).
 ### R6. Container + Kubernetes — Dockerfile and manifests with health probes, secrets via k8s Secret (Radar track).
