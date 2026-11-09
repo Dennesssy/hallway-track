@@ -1,0 +1,8 @@
+.build
+.git
+.DS_Store
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+pepper
+Resources

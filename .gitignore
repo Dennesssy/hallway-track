@@ -11,3 +11,11 @@ research/perksmix-ref/
 dist/
 test-results/
 !.env.example
+
+# Swift server: build output and any local databases/secrets (never commit user data)
+swift-server/.build/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+pepper
