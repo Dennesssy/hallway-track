@@ -107,15 +107,15 @@ a{color:var(--accent)}
 <section>
   <div class="verdict">
     <div class="panel">
-      <div class="eyebrow">Verdict</div>
-      <h1>Ship one project that enters all 5 prize tracks. Build window is under 3 hours.</h1>
-      <p style="color:var(--mute);margin:10px 0 0">Working title <b>Hallway Track</b>: a conference talk finder (Elasticsearch hybrid search) that is accessible by design, instrumented with Dash0, deployed on Kubernetes watched by Radar, with every change landing through a Gitar-reviewed PR. One codebase, five scoring angles.</p>
+      <div class="eyebrow">The idea</div>
+      <h1>Hallway Track: a conference app that slows down, explains itself, and gets fixed in front of the judges.</h1>
+      <p style="color:var(--mute);margin:10px 0 0">Attendees find the right talk by meaning (Elasticsearch), build a time-zone-correct agenda, and find a quiet, step-free, captioned room. When 170 people open it at once after the keynote it really slows; Dash0 explains why, Radar shows the cluster coping, and Gitar-reviewed pull requests fix it. One story, every track.</p>
     </div>
     <div class="panel">
       <div class="eyebrow">Read-out</div>
-      <div class="stat"><span>Top prize pool</span><b class="mono">$16,000 cash (4 × $4,000) + DGX Spark + iPad</b></div>
-      <div class="stat"><span>Team</span><b>Solo or any size, one submission</b></div>
-      <div class="stat"><span>Build minutes left</span><b class="mono" id="buildleft">--</b></div>
+      <div class="stat"><span>Prize pool</span><b class="mono">$16,000 cash + DGX Spark + iPad</b></div>
+      <div class="stat"><span>Stack</span><b>Swift on NIO · HTMX · Elasticsearch</b></div>
+      <div class="stat"><span>Starter</span><b>PerksMix server, imported unmodified</b></div>
       <div class="stat"><span>Submission platform</span><span class="pill p-hi">NOT FOUND</span></div>
       <div class="stat"><span>Presentations</span><b class="mono">5:30–6:30 PM</b></div>
     </div>
@@ -123,31 +123,86 @@ a{color:var(--accent)}
 </section>
 
 <section>
-  <h2>Time budget · now to submit</h2>
-  <div class="panel">
-    <div class="gantt" id="gantt"></div>
-    <div class="axis"><span>2:30</span><span>3:00</span><span>3:30</span><span>4:00</span><span>4:30</span><span>5:00</span><span>5:30</span></div>
-    <p style="font-size:12px;color:var(--mute);margin:8px 0 0">Orange line is now. Bars turn solid while active and green when their time has passed. Checks are saved in this browser only.</p>
+  <h2>Setup status</h2>
+  <div class="grid g3">
+    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Elasticsearch</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Project "Hackathon", Iowa, version 9.7. API key works. Jina embeddings and rerankers available. Semantic search tested on a throwaway index.</p></div>
+    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Dash0</h3><p style="margin:6px 0 0;font-size:13.5px">Ingest token accepted (HTTP 200) at the us-west-2 endpoint. <b>Rotate it:</b> it was pasted into chat.</p></div>
+    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Tools</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Swift starter builds. kubectl, kubectl-radar, argocd, helm, dash0 CLI, gitleaks installed. OrbStack Kubernetes running.</p></div>
+    <div class="panel"><span class="pill p-ok">DONE</span><h3 style="margin-top:8px;font-size:15px">Secrets</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Git history: 0 findings. Keys live only in the gitignored <code>.env</code>. Banner photo stripped of GPS.</p></div>
+    <div class="panel"><span class="pill p-hi">NEEDS YOU</span><h3 style="margin-top:8px;font-size:15px">GitHub + Gitar</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Create the public repo, push once, install the Gitar app. After that, no commits to main: every feature is a PR.</p></div>
+    <div class="panel"><span class="pill p-hi">NEEDS YOU</span><h3 style="margin-top:8px;font-size:15px">Radar + cluster</h3><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Join code from the Radar table, or choose OrbStack. Reconnect BrowserOS Neo with /mcp for UI tests.</p></div>
   </div>
 </section>
 
 <section>
-  <h2>Roadblocks to clear now</h2>
-  <div class="grid g2" id="rbs"></div>
+  <h2>The demo story: Keynote Rush</h2>
+  <div class="panel mx-wrap">
+    <table>
+      <thead><tr><th>Beat</th><th>What the judges see</th><th>Track</th></tr></thead>
+      <tbody>
+        <tr><td>1. Press the button</td><td>Real load: about 170 simulated attendees open their agenda at once. The in-app health strip and the Dash0 dashboard both climb.</td><td>Dash0</td></tr>
+        <tr><td>2. My agenda slows</td><td>Latency and the SLO burn. Real-user monitoring shows what attendees felt.</td><td>Dash0</td></tr>
+        <tr><td>3. Ask Agent0 why</td><td>It names the slow span: one Elasticsearch request per saved talk.</td><td>Dash0 + Elasticsearch</td></tr>
+        <tr><td>4. Cluster under pressure</td><td>The autoscaler adds pods; one is killed; Radar's AI investigation explains the restart.</td><td>Radar</td></tr>
+        <tr><td>5. The fix</td><td>One batched query as a pull request. A deliberately broken test is fixed live by Gitar's auto-apply.</td><td>Sonar</td></tr>
+        <tr><td>6. Rerun the rush</td><td>Latency and the SLO recover. Before and after are saved.</td><td>All</td></tr>
+        <tr><td>7. Quiet route</td><td>The same live crowd signal helps someone who needs a calm, step-free, captioned room.</td><td>Merge Forward</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--mute);margin:8px 0 0">The first version of My agenda is written the naive way on purpose and disclosed in the README as a demo of an observability-driven fix.</p>
 </section>
 
 <section>
-  <h2>One project, every track</h2>
+  <h2>Judging criteria: where each one is covered</h2>
   <div class="panel mx-wrap">
     <table>
-      <thead><tr><th>Track</th><th>Prize</th><th>What the judges look for</th><th>How Hallway Track earns it</th></tr></thead>
+      <thead><tr><th>Track</th><th>Criterion</th><th>Covered by</th><th>State</th></tr></thead>
       <tbody>
-        <tr><td><b>Sonar</b><br>Never Merge Broken</td><td class="mono">$4,000</td><td>Features land via reviewed PRs, review rules file, CI failure auto-fix on a real problem</td><td>Every feature is a PR. Add a rules file. Break CI once on purpose and show Gitar fix it.</td></tr>
-        <tr><td><b>Dash0</b><br>Stop Flying Blind</td><td class="mono">$4,000</td><td>Traces, logs, metrics; Agent0 or MCP finds and fixes something real; dashboard or SLO bonus</td><td>OpenTelemetry on the API. Plant a slow query, find it with Agent0, fix it on camera. One SLO on search latency.</td></tr>
-        <tr><td><b>Radar</b><br>AI SRE</td><td class="mono">$4,000</td><td>Runs on Kubernetes with Radar connected; AI investigation of a real issue shown</td><td>Deploy to the cluster, point Radar at it, let it diagnose a crash-looping pod we cause.</td></tr>
-        <tr><td><b>Elasticsearch</b><br>Find the Right Talk</td><td class="mono">$4,000</td><td>Elasticsearch is the core data layer; smart keyword plus semantic or vector search</td><td>Hybrid query (BM25 + semantic_text) over 60 sessions. This is the product.</td></tr>
-        <tr><td><b>Merge Forward</b><br>Conferences for Everyone</td><td class="mono">iPad</td><td>Makes conferences more inclusive and accessible</td><td>Filters for captions, sign language, step-free rooms, quiet rooms. Keyboard and screen-reader clean.</td></tr>
-        <tr><td><b>Overall</b></td><td class="mono">DGX Spark</td><td>Best project from any track</td><td>A clear 3-minute demo that touches every sponsor tool for a real reason.</td></tr>
+        <tr><td rowspan="3"><b>Sonar</b></td><td>Features land through PRs Gitar reviewed, not one PR at the end</td><td>R18: branch and PR per feature after the first push</td><td><span class="pill p-hi">NEEDS REPO</span></td></tr>
+        <tr><td>Project-aware review instructions and repository rules</td><td>R19: <code>.gitar/review/</code> rules for time zones, accessibility, API-to-frontend match, no secrets</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td>CI failure diagnosis and auto-apply on a real problem</td><td>R13, R22: broken test fixed live in the fix PR</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td rowspan="4"><b>Dash0</b></td><td>Depth: traces, logs, metrics, real-user monitoring</td><td>R11: swift-otel exporter plus Dash0 Web SDK</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td>Agent0 or MCP finds and fixes something real, shown in the demo</td><td>R22: Keynote Rush, beat 3</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td>Observability is part of the product, not bolted on</td><td>Health strip in the UI: latency, sparkline, SLO, trace ID</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td>Bonus: dashboard or SLO</td><td>R11: SLO, dashboard and alerts as YAML applied with the Dash0 CLI</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td rowspan="3"><b>Radar</b></td><td>Runs on Kubernetes with Radar connected</td><td>R12: probes, autoscaler, Argo CD</td><td><span class="pill p-hi">NEEDS YOU</span></td></tr>
+        <tr><td>Radar UI and MCP used throughout building and operating</td><td>R20: usage log with timestamps and screenshots</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td>AI investigation of a real issue, with what we learned</td><td>R22, beat 4, plus runbooks</td><td><span class="pill p-md">PLANNED</span></td></tr>
+        <tr><td rowspan="2"><b>Elasticsearch</b></td><td>Core data layer, not a side feature</td><td>R10: search, agenda and crowd data live in Elasticsearch</td><td><span class="pill p-ok">READY</span></td></tr>
+        <tr><td>Smart search: keyword, semantic, vector, hybrid</td><td>R10: hybrid plus Jina reranker, multilingual, plain-language intent, relevance tests</td><td><span class="pill p-ok">READY</span></td></tr>
+        <tr><td><b>All tracks</b></td><td>Makes conferences easier</td><td>Talk search, My agenda (R16), Quiet route (R23)</td><td><span class="pill p-md">PLANNED</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>The sponsors' own ideas: all covered</h2>
+  <div class="grid g3">
+    <div class="panel"><b>Elasticsearch</b><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Talk search by meaning (R10) · hallway matchmaker and RAG schedule assistant (R21).</p></div>
+    <div class="panel"><b>Dash0</b><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Chaos button with Agent0 (R22) · live crowd map (R17) · My agenda slowdown (R16, R22) · OpenLIT tracing if the assistant is built (R21).</p></div>
+    <div class="panel"><b>Sonar</b><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Schedule builder with a time-zone rule (R16, R19) · API-to-frontend rule (R19) · break CI on purpose (R13, R18).</p></div>
+    <div class="panel"><b>Radar</b><p style="margin:6px 0 0;font-size:13.5px;color:var(--mute)">Talk picker that reshuffles when a room fills (R16, R17) · crowd map (R17) · matchmaker (R21).</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Workstreams</h2>
+  <div class="panel mx-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Workstream</th><th>Depends on</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td>S0</td><td>Starter import (PerksMix Swift server and HTML, unmodified)</td><td>none</td><td><span class="pill p-ok">DONE</span></td></tr>
+        <tr><td>S1</td><td>Trim the starter, SwiftNIO core, security headers, health checks</td><td>S0</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S2</td><td>Search: Elasticsearch hybrid, Jina rerank, multilingual, intent; in-memory fallback; indexer</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S3</td><td>HTMX UI, My agenda, Quiet route (DESIGN.md, COPY.md)</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S4–S5</td><td>Accessibility build and proof; BrowserOS Neo tests</td><td>S3</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S6</td><td>Relevance tests and CI gate</td><td>S2</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S7</td><td>Telemetry: traces, logs, metrics, RUM, SLO, dashboards, alerts</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S8</td><td>Container, Kubernetes, Argo CD, autoscaler, Radar</td><td>S1</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S9–S11</td><td>Keynote Rush load, fault runbooks, CI with Gitar rules, the full incident loop</td><td>S2, S7, S8</td><td><span class="pill p-md">QUEUED</span></td></tr>
+        <tr><td>S12–S13</td><td>BUILD.md, README, EXPLAIN.md (your words); WebGPU on-device experiment</td><td>all</td><td><span class="pill p-md">QUEUED</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -156,10 +211,10 @@ a{color:var(--accent)}
 <section>
   <h2>Architecture</h2>
   <div class="panel" style="overflow-x:auto">
-    <svg viewBox="0 0 760 250" width="760" role="img" aria-label="Browser calls a Swift API, which queries Elasticsearch and sends telemetry to Dash0. The API runs on Kubernetes watched by Radar. GitHub PRs are reviewed by Gitar.">
-      <rect class="b" x="10" y="95" width="120" height="60" rx="8"/><text x="70" y="122" text-anchor="middle">Browser UI</text><text class="s" x="70" y="140" text-anchor="middle">a11y filters</text>
-      <rect class="a" x="190" y="95" width="150" height="60" rx="8"/><text x="265" y="122" text-anchor="middle">Swift API</text><text class="s" x="265" y="140" text-anchor="middle">Vapor + OTel</text>
-      <rect class="a" x="420" y="20" width="150" height="60" rx="8"/><text x="495" y="47" text-anchor="middle">Elasticsearch</text><text class="s" x="495" y="65" text-anchor="middle">hybrid search</text>
+    <svg viewBox="0 0 760 250" width="760" role="img" aria-label="Browser with HTMX calls a Swift API on SwiftNIO, which queries Elasticsearch and sends telemetry to Dash0. The API runs on Kubernetes watched by Radar. GitHub pull requests are reviewed by Gitar.">
+      <rect class="b" x="10" y="95" width="120" height="60" rx="8"/><text x="70" y="122" text-anchor="middle">Browser</text><text class="s" x="70" y="140" text-anchor="middle">HTMX + a11y</text>
+      <rect class="a" x="190" y="95" width="150" height="60" rx="8"/><text x="265" y="122" text-anchor="middle">Swift API</text><text class="s" x="265" y="140" text-anchor="middle">NIO + OTel</text>
+      <rect class="a" x="420" y="20" width="150" height="60" rx="8"/><text x="495" y="47" text-anchor="middle">Elasticsearch</text><text class="s" x="495" y="65" text-anchor="middle">Jina hybrid + rerank</text>
       <rect class="a" x="420" y="170" width="150" height="60" rx="8"/><text x="495" y="197" text-anchor="middle">Dash0</text><text class="s" x="495" y="215" text-anchor="middle">traces, SLO, Agent0</text>
       <rect class="w" x="620" y="95" width="130" height="60" rx="8"/><text x="685" y="122" text-anchor="middle">Radar</text><text class="s" x="685" y="140" text-anchor="middle">watches cluster</text>
       <rect class="b" x="190" y="195" width="150" height="45" rx="8"/><text x="265" y="215" text-anchor="middle">GitHub PRs</text><text class="s" x="265" y="231" text-anchor="middle">Gitar reviews</text>
@@ -170,119 +225,51 @@ a{color:var(--accent)}
 </section>
 
 <section>
-  <h2>Shortcuts available</h2>
-  <div class="grid g3">
-    <div class="panel"><span class="pill p-ok">SAVES ~40 MIN</span><p style="margin:8px 0 0">Seed data is generated, not scraped. 60 fictional sessions, one JSON file, written by a Haiku agent.</p></div>
-    <div class="panel"><span class="pill p-ok">SAVES ~25 MIN</span><p style="margin:8px 0 0">Elasticsearch <code>semantic_text</code> field does embeddings for us. No model hosting, no vector code.</p></div>
-    <div class="panel"><span class="pill p-ok">SAVES ~30 MIN</span><p style="margin:8px 0 0">Radar starter repo <code>skyhook-io/cnh-starter</code> and the shared cluster skip local cluster setup.</p></div>
-    <div class="panel"><span class="pill p-ok">SAVES ~20 MIN</span><p style="margin:8px 0 0">OpenTelemetry export to Dash0 over plain OTLP/HTTP from Swift, configured by env vars. Package support for Swift still to verify.</p></div>
-    <div class="panel"><span class="pill p-ok">SAVES ~15 MIN</span><p style="margin:8px 0 0">HTMX front end: the Swift server returns HTML fragments, no framework build step.</p></div>
-    <div class="panel"><span class="pill p-md">CUT FIRST</span><p style="margin:8px 0 0">Order of cuts if late: Dash0 SLO, then RUM, then sign-language filter polish. Never cut the PR flow or the demo.</p></div>
-  </div>
-</section>
-
-<section>
-  <h2>Who does what</h2>
-  <div class="grid g2">
-    <div class="panel"><span class="who you">YOU</span><h3 style="margin-top:6px">Human-only</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Four account sign-ups (Gitar, Dash0, Radar, Elastic), Radar join code at the Radar table, ask organizers where to submit, start Docker, pitch and record the demo.</p></div>
-    <div class="panel"><span class="who">CLAUDE</span><h3 style="margin-top:6px">Orchestrator and builder</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Repo, API, search, UI, Dockerfile, k8s manifests, OTel wiring, PR flow, final verification. Reads Haiku output before using it.</p></div>
-    <div class="panel"><span class="who">HAIKU-R</span><h3 style="margin-top:6px">Research (running)</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">Sponsor cheat sheet into <code>research/sponsors.md</code>: exact env vars, commands, gotchas.</p></div>
-    <div class="panel"><span class="who">HAIKU-W</span><h3 style="margin-top:6px">Writing (running, more queued)</h3><p style="font-size:13.5px;color:var(--mute);margin:4px 0 0">60-session seed data now. Next: README with AI disclosure, demo script, Devpost-style description.</p></div>
-  </div>
+  <h2>Open items</h2>
+  <div class="grid g2" id="rbs"></div>
 </section>
 
 <section>
   <h2>Rules that can disqualify us</h2>
   <div class="grid g2">
-    <div class="panel"><span class="pill p-ok">OK</span> Code started after kickoff. Build window opened 11:00 AM, so a fresh repo now is compliant.</div>
-    <div class="panel"><span class="pill p-md">DO</span> Public repo plus README with setup steps. Disclose AI coding assistant use in the README.</div>
-    <div class="panel"><span class="pill p-md">DO</span> You must be able to explain the architecture and decisions. Read what Claude builds before presenting.</div>
-    <div class="panel"><span class="pill p-md">DO</span> No secrets, personal data or logins in the repo or demo. <code>.env</code> is already gitignored.</div>
+    <div class="panel"><span class="pill p-md">ASK</span> Is an earlier own project OK as a disclosed starter template? (rule 8). Ask the organizers; it is imported unmodified so the diff shows today's work.</div>
+    <div class="panel"><span class="pill p-md">DO</span> Public repo plus README with setup steps. Disclose AI assistant use in the README.</div>
+    <div class="panel"><span class="pill p-md">DO</span> You must be able to explain the code. EXPLAIN.md holds the questions; the answers are yours.</div>
+    <div class="panel"><span class="pill p-ok">OK</span> No secrets in the repo: history scanned clean, keys only in <code>.env</code>.</div>
   </div>
 </section>
 
-<p class="foot">Sources: wemakedevs.org/hackathons/cnh (overview, schedule, rules, resources), read by a Haiku agent today. Environment checks (gh, docker, kubectl) run locally at 2:33 PM MT. Things marked NOT FOUND were absent from those pages.</p>
+<p class="foot">Sources: wemakedevs.org/hackathons/cnh pages, the sponsors' ideas and judging criteria as read from the event site, and checks run on this Mac today. Plans live in the repo: ARCHITECTURE.md, docs/event/instruction.md, docs/design/DESIGN.md, docs/design/COPY.md, .agents/ORIGINAL_REQUEST.md.</p>
 </div>
 
 <script>
-// Times in minutes since midnight, Mountain Time (MST, UTC-7 on Nov 9 2026).
 var DEADLINE=new Date("2026-11-09T17:30:00-07:00").getTime();
-var AXIS0=14*60+30, AXIS1=17*60+30, SPAN=AXIS1-AXIS0;
-var PHASES=[
- {n:"Unblock",s:14*60+35,e:14*60+50,tasks:[
-  ["Sign up: Elastic Serverless trial (ela.st/hack-kubecon), Dash0, Radar, Gitar","you"],
-  ["Start Docker Desktop; get Radar join code at the Radar table","you"],
-  ["Ask organizers where projects are submitted","you"],
-  ["Create public GitHub repo, push scaffold with .gitignore and README stub","claude"]]},
- {n:"Core search",s:14*60+50,e:15*60+40,tasks:[
-  ["Index sessions.json into Elasticsearch with a semantic_text field","claude"],
-  ["Hybrid search endpoint: keyword plus semantic, accessibility filters","claude"],
-  ["HTMX UI: search box, filter chips, result cards","claude"],
-  ["Open feature 1 as a PR so Gitar reviews it","claude"]]},
- {n:"Platform",s:15*60+40,e:16*60+20,tasks:[
-  ["Dockerfile and k8s manifests, deploy to cluster","claude"],
-  ["Connect Radar to the cluster, verify it sees the pods","you"],
-  ["OpenTelemetry to Dash0: traces and logs flowing","claude"],
-  ["Add Gitar rules file; push a deliberately failing CI run","claude"]]},
- {n:"Inclusive + demo moments",s:16*60+20,e:16*60+50,tasks:[
-  ["Accessibility pass: keyboard, labels, contrast, captions filter","claude"],
-  ["Plant slow query, find it with Dash0 Agent0, fix it (demo moment)","claude"],
-  ["Crash a pod, capture Radar AI investigation (demo moment)","you"]]},
- {n:"Docs + demo",s:16*60+50,e:17*60+15,tasks:[
-  ["README: setup, architecture, AI disclosure, track map","claude"],
-  ["Demo script, 3 minutes, one beat per sponsor","claude"],
-  ["Record or rehearse the demo","you"]]},
- {n:"Submit buffer",s:17*60+15,e:17*60+30,tasks:[
-  ["Hard freeze. Final repo check from a clean clone","claude"],
-  ["Submit and screenshot the confirmation","you"]]}
-];
-var RB=[
- {sev:"hi",t:"Submission platform is unknown",d:"The event pages name a 5:30 PM deadline but no Devpost or form link.",f:"Ask at the registration desk now. Fallback: public repo URL plus README, ready to hand over."},
- {sev:"hi",t:"No Kubernetes cluster yet",d:"Checked at 2:33 PM: Docker daemon is not running, kubectl has no context, kind is not installed.",f:"Fastest: join the shared cluster at join.cnh.radarhq.io (code at the Radar table). Backup: start Docker, brew install kind."},
- {sev:"hi",t:"Four sponsor accounts need a human",d:"Elastic, Dash0, Radar and Gitar sign-ups need your browser and email. Claude cannot do these.",f:"Do all four in parallel in the next 10 minutes. Paste API keys into .env only, never into chat or the repo."},
- {sev:"md",t:"Gitar needs real PRs",d:"The Sonar track scores features landing through reviewed PRs. GitHub CLI is logged in as Dennesssy, so PRs are possible.",f:"Install the Gitar app on the new repo first, then branch per feature."},
- {sev:"md",t:"Understand-your-code rule",d:"Rules 6 and 7 allow rejection of AI output you cannot explain.",f:"Reserve 10 minutes to read the code and rehearse. Disclose AI assistance in the README."},
- {sev:"lo",t:"Event page inconsistencies",d:"Hero shows $0 prize pool; FAQ says breakfast at 10 versus 9. $4,000 of the $20,000 is unallocated on the page.",f:"Ignore. Confirm the pool at the desk only if you have spare minutes."}
-];
-var PILL={hi:["BLOCKS BUILD","p-hi"],md:["WATCH","p-md"],lo:["MINOR","p-lo"]};
-var store={};try{store=JSON.parse(localStorage.getItem("hb-checks")||"{}")}catch(e){}
-function save(){try{localStorage.setItem("hb-checks",JSON.stringify(store))}catch(e){}}
 function pad(n){return (n<10?"0":"")+n}
 function hm(m){var h=Math.floor(m/60);return (h>12?h-12:h)+":"+pad(m%60)}
 function mtMinutes(){var p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Denver",hour:"numeric",minute:"numeric",hour12:false}).formatToParts(new Date()),h=0,m=0;
   p.forEach(function(x){if(x.type==="hour")h=+x.value%24;if(x.type==="minute")m=+x.value});return h*60+m}
-function build(){
-  var g=document.getElementById("gantt");g.innerHTML="";
-  PHASES.forEach(function(p,i){
-    var row=document.createElement("div");
-    var left=(p.s-AXIS0)/SPAN*100,w=(p.e-p.s)/SPAN*100;
-    row.innerHTML='<div class="ph-label"><b>'+p.n+'</b><span class="mono">'+hm(p.s)+'–'+hm(p.e)+' · '+(p.e-p.s)+' min</span><span class="mono" id="st'+i+'"></span></div>'+
-      '<div class="track"><div class="bar" id="bar'+i+'" style="left:'+left+'%;width:'+w+'%">'+(p.e-p.s)+'m</div><div class="nowline" id="now'+i+'"></div></div>';
-    var d=document.createElement("details");if(i<2)d.open=true;
-    var s=document.createElement("summary");s.textContent="Tasks ("+p.tasks.length+")";d.appendChild(s);
-    var ul=document.createElement("ul");ul.className="tasks";
-    p.tasks.forEach(function(t,j){var k=i+"-"+j,li=document.createElement("li"),lb=document.createElement("label"),cb=document.createElement("input");
-      cb.type="checkbox";cb.id="t"+k;cb.checked=!!store[k];cb.onchange=function(){store[k]=cb.checked;save()};
-      var sp=document.createElement("span");sp.textContent=t[0];var w2=document.createElement("span");w2.className="who "+(t[1]==="you"?"you":"");w2.textContent=t[1].toUpperCase();
-      lb.appendChild(cb);lb.appendChild(sp);lb.appendChild(w2);li.appendChild(lb);ul.appendChild(li)});
-    d.appendChild(ul);row.appendChild(d);g.appendChild(row)});
-  var r=document.getElementById("rbs");RB.forEach(function(b){var c=document.createElement("div");c.className="panel rb";
-    c.innerHTML='<div><span class="pill '+PILL[b.sev][1]+'">'+PILL[b.sev][0]+'</span></div><h3>'+b.t+'</h3><p>'+b.d+'</p><p class="fix"><b>Fix:</b> '+b.f+'</p>';r.appendChild(c)});
-}
+var RB=[
+ {sev:"hi",t:"Create the public repo and push once",d:"Gitar can only review pull requests, and the Sonar track wants features landing through PRs, not one at the end. The push was blocked earlier.",f:"Run: gh repo create Dennesssy/hallway-track --public --source . --remote origin --push. Then install the Gitar app on it."},
+  {sev:"hi",t:"git-secrets hooks block commits",d:"Its pre-commit hook misfires on this Mac and rejects every commit. Edits are saved but uncommitted.",f:"Approve removing the three hook files and using gitleaks instead."},
+  {sev:"hi",t:"Rotate the Dash0 token",d:"The token was pasted into chat. It works, but chat is not private.",f:"Create a new token in Dash0, delete hallway-track-ingest, update OTEL_EXPORTER_OTLP_HEADERS in .env."},
+  {sev:"hi",t:"Choose the cluster",d:"Radar track needs Kubernetes with Radar connected: the event cluster (join code at the Radar table) or OrbStack locally.",f:"Get the join code, or say OrbStack and we install Argo CD, the Dash0 operator and Radar there."},
+  {sev:"md",t:"Reconnect BrowserOS Neo",d:"Its tools are not in this session, so UI tests cannot run yet.",f:"Run /mcp and reconnect browseros-neo."},
+  {sev:"md",t:"Where do we submit?",d:"The event pages name a 5:30 PM deadline but no form link.",f:"Ask at the registration desk. Fallback: repo URL plus README."},
+  {sev:"lo",t:"Local paths in .agents/",d:"Coordination notes contain /Users/denn paths.",f:"Sanitize or stop tracking .agents/ before the push; pick a licence."}
+];
+var PILL={hi:["NEEDS YOU","p-hi"],md:["WATCH","p-md"],lo:["MINOR","p-lo"]};
+(function(){var r=document.getElementById("rbs");RB.forEach(function(b){var c=document.createElement("div");c.className="panel rb";
+  var top=document.createElement("div"),pl=document.createElement("span");pl.className="pill "+PILL[b.sev][1];pl.textContent=PILL[b.sev][0];top.appendChild(pl);
+  var h=document.createElement("h3");h.textContent=b.t;var d=document.createElement("p");d.textContent=b.d;var f=document.createElement("p");f.className="fix";
+  var fb=document.createElement("b");fb.textContent="Next: ";f.appendChild(fb);f.appendChild(document.createTextNode(b.f));
+  c.appendChild(top);c.appendChild(h);c.appendChild(d);c.appendChild(f);r.appendChild(c)})})();
 function tick(){
-  var ms=DEADLINE-Date.now(),neg=ms<0;if(neg)ms=0;
+  var ms=DEADLINE-Date.now();if(ms<0)ms=0;
   var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sc=s%60;
   document.getElementById("count").textContent=pad(h)+":"+pad(m)+":"+pad(sc);
   var now=mtMinutes();
   document.getElementById("clocknow").textContent="now "+hm(now)+" "+(now>=720?"PM":"AM")+" MT";
-  var freeze=17*60+15;document.getElementById("buildleft").textContent=Math.max(0,freeze-now)+" min to freeze";
-  document.getElementById("meter").style.width=Math.min(100,Math.max(0,(now-(11*60))/(17*60+30-11*60)*100))+"%";
-  PHASES.forEach(function(p,i){
-    var bar=document.getElementById("bar"+i),st=document.getElementById("st"+i),nl=document.getElementById("now"+i);
-    bar.className="bar"+(now>=p.e?" done":(now>=p.s?" cur":""));
-    st.textContent=now>=p.e?"DONE WINDOW":(now>=p.s?"ACTIVE NOW":"");
-    var pos=(now-AXIS0)/SPAN*100;nl.style.left=Math.min(100,Math.max(0,pos))+"%";
-  });
+  document.getElementById("meter").style.width=Math.min(100,Math.max(0,(now-660)/(17*60+30-660)*100))+"%";
 }
-build();tick();setInterval(tick,1000);
+tick();setInterval(tick,1000);
 </script>

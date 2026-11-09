@@ -2,7 +2,7 @@
 
 What the UI must show so each prize's judges see their criteria met in the first 3 minutes, plus a layout and motion system that demonstrates craft. Builds on the PerksMix starter in `swift-server/` (HTML in `swift-server/Public/index.html`; HTTP layer on SwiftNIO) and the API contract in `.agents/teamwork_preview_orchestrator_1/PROJECT.md`. The earlier Node and vanilla-JS prototypes were removed (commits 62fd2c8, 2885473 in history).
 
-No design guarantees a win. Every item below is tied to a written judging criterion from `docs/EVENT.md`, so each one is a point a judge can tick.
+No design guarantees a win. Every item below is tied to a written judging criterion from `docs/event/EVENT.md`, so each one is a point a judge can tick.
 
 ## 1. Prizes → criteria → feature → demo beat
 
@@ -28,7 +28,9 @@ No design guarantees a win. Every item below is tied to a written judging criter
 6. "Show the query" drawer: the request URL and response summary (backend, per-path counts, latency). With the Elastic backend, also show the query body if the API exposes it (needs an M1 addition; skip if not exposed, never fake it).
 7. Keyboard: `/` focuses search, `Esc` clears, arrow keys move between cards, focus ring always visible.
 
-**P2, only if P1 is done and gated:** "Build my day" list with clash detection; share link (`#q=` is fine outside artifacts); print stylesheet.
+**P1b, from the sponsors' own ideas (requests R16, R17):** **My agenda** timeline with clash detection and time-zone-correct display (venue zone default), a "Suggest a swap" action using Elasticsearch similarity within the same slot, and a simulated room-fill badge. The Dash0 demo beat becomes "Agent0 explains why My agenda slowed down after the keynote burst"; the Sonar beat is a Gitar rule that every time carries a zone.
+
+**P2, only if the above is done and gated:** share link (`#q=` is fine outside artifacts); print stylesheet; hallway matchmaker; RAG assistant over abstracts.
 
 **Out:** accounts, maps, calendar export, any front-end framework or build step.
 
@@ -182,3 +184,20 @@ Never assume support: judges' machines are unknown. Cache the result for the ses
 - Hidden unless the capability check passes or the user opens `?experiments=1`.
 
 **Acceptance.** Capability states render correctly in Neo (WebGPU on, and with it disabled via the flag); consent dialog appears before any download; re-rank changes the order of at least one test query and is labelled; core search still passes every check with the experiment off.
+
+
+## 11. The story that ties it together: "Keynote Rush" (requests R22, R23)
+
+One button, one story, every track. The keynote ends and 170 people open their agenda at once.
+
+| Beat | What the judges see | Track |
+|---|---|---|
+| 1. Press Keynote Rush | Real load starts; the in-app ops strip and the Dash0 dashboard both climb | Dash0 |
+| 2. My agenda slows | Latency and SLO burn; Real-user monitoring shows what attendees felt | Dash0 |
+| 3. Ask Agent0 "why is My agenda slow?" | It names the span: one Elasticsearch request per saved talk | Dash0 + Elasticsearch |
+| 4. Pods under pressure | The HPA scales up, a pod is killed, Radar's AI investigation explains the restart | Radar |
+| 5. The fix | One batched query, opened as a PR; a broken test fixed live by Gitar auto-apply | Sonar |
+| 6. Rerun the rush | Latency and SLO recover; before/after saved | all |
+| 7. Quiet route | Same live crowd signal helps someone who needs a calm, step-free, captioned room | Merge Forward |
+
+Why this works: it is one believable conference moment, every beat is real telemetry and real tooling, and each judge sees their own tool earn its place. The naive first version is disclosed in the README as deliberate.

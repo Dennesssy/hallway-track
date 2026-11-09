@@ -18,7 +18,7 @@ Known unverified: EIS/Jina availability on trial; must be reported UNVERIFIED, n
 | F3 | Indexer script (npm run index) | M1 |
 | F4 | Server tests (node:test), ES integration tests SKIP w/o creds | M1 |
 | F5 | Web UI per approved spec | M2 |
-| F5b | HTMX rebuild of web UI (user 15:28): htmx 2.x vendored, server-rendered fragments /ui/results, /ui/meta, /ui/query, full-page fallback at /; replaces vanilla-JS UI 2885473; implements docs/DESIGN.md §2–5 | M2 (redo) + M1 change |
+| F5b | HTMX rebuild of web UI (user 15:28): htmx 2.x vendored, server-rendered fragments /ui/results, /ui/meta, /ui/query, full-page fallback at /; replaces vanilla-JS UI 2885473; implements docs/design/DESIGN.md §2–5 | M2 (redo) + M1 change |
 | F6 | UI tests via BrowserOS neo ONLY (no Playwright, user 15:25): a11y scan, 390px, light/dark, keyboard, DESIGN.md §7 | M3 |
 | F7 | OpenTelemetry (traces/logs/metrics, OTLP env config, local exporter test) | M4 |
 | F8 | Dockerfile, .dockerignore, k8s manifests | M5 |

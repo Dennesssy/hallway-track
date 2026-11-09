@@ -19,7 +19,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 | M1 | Server (Node) | **superseded** | 62fd2c8 | stopped at launch | User 15:38: build from the Swift server. Node kept in history only. |
 | M1s | Swift server: Hallway Track API + HTMX fragments + ES + tests | queued | – | – | Starts from swift-server/ |
 | M2 | Web UI (vanilla JS) | **superseded** | 2885473 | stopped at launch | Rebuild as HTMX from swift-server/Public/index.html |
-| M2b | Design pass (docs/DESIGN.md) | queued | 3cd2558 (spec) | – | Folded into the HTMX rebuild |
+| M2b | Design pass (docs/design/DESIGN.md) | queued | 3cd2558 (spec) | – | Folded into the HTMX rebuild |
 | M3 | UI tests | queued | – | – | BrowserOS neo ONLY, no Playwright (user 15:25) |
 | M4 | Observability (OTel → Dash0) | queued | – | – | |
 | M5 | Container + K8s | queued | – | – | OrbStack k8s running, context `orbstack` |
@@ -50,6 +50,7 @@ Hard freeze: 17:15 MT · Submission: 17:30 MT
 - DESIGN.md now adopts the PerksMix design language, with an AA-safe accent (#0056b3 text; starter #007bff is 3.98:1 on white).
 
 ## User decisions log (newest first)
+- Judging criteria pasted by user: added R18 (PR-per-feature, no commits to main after first push), R19 (project-aware Gitar rules), R20 (Radar/Dash0 usage evidence), R21 (matchmaker, RAG assistant, OpenLIT). Workers must branch + PR from now on.
 - Full scope: add reranker, multilingual, intent, relevance suite + CI gate, RUM, SLO/dashboards/alerts, synthetic, Dash0 operator, Argo CD, HPA, faults + runbooks, incident loop, WCAG audit, VoiceOver, JS-off, forced-colors, dyslexia option, EXPLAIN.md (R10-R15). Nothing is optional except R9. User: "i didnt tell you to leave it out, include everything needed".
 - 15:5x "use swift nio": HTTP server on SwiftNIO (NIOHTTP1) instead of Vapor; AsyncHTTPClient for Elasticsearch; fallback to Vapor if not working by 16:10.
 - 15:38 Start the build from PerksMix's Swift server + HTML (imported unmodified, d127f28). Server language = Swift/Vapor.

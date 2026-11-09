@@ -41,14 +41,38 @@ Goal: win the Cloud Native Hackathon (deadline 2026-11-09 5:30 PM MT). One proje
 ## Layout
 ```
 Hackathon-Slc/
-├─ ARCHITECTURE.md
-├─ docs/                  EVENT.md, DESIGN.md, COPY.md
-├─ instruction.md         the event website's instructions
-├─ plans/board.html       visual plan board (also published as artifact)
-├─ research/              sponsors.md
-├─ data/sessions.json     60 fictional sessions
-├─ swift-server/          Vapor server + Public/index.html (starter d127f28, then trimmed)
-└─ (next) deploy/ .github/ .gitar/ BUILD.md
+├─ README.md               what this is, track map, AI disclosure, starter-template note
+├─ ARCHITECTURE.md         topology, constraints, layout, roadmap
+├─ BUILD.md                (planned) install, configure, index, run, test, deploy
+├─ EXPLAIN.md              the human team member's own explanations (rule 6)
+├─ .env.example            variable names only; the real .env is gitignored
+├─ swift-server/           Swift on SwiftNIO server + HTMX front end (starter d127f28, then trimmed)
+│  ├─ Package.swift
+│  ├─ Sources/App/         routes, search backends, telemetry, views
+│  ├─ Sources/Indexer/     (planned) loads data/sessions.json into Elasticsearch
+│  ├─ Tests/               server tests (swift test)
+│  ├─ Public/              HTMX pages, CSS, vendored htmx and Dash0 web SDK
+│  └─ Dockerfile
+├─ data/                   sessions.json: 60 fictional sessions
+├─ eval/                   relevance queries, runner, REPORT.md, CI gate baseline
+├─ deploy/
+│  ├─ k8s/                 manifests: probes, autoscaler, disruption budget
+│  ├─ argocd/              Argo CD application (push deploys)
+│  └─ dash0/               SLO, dashboards, alerts, synthetic checks as YAML
+├─ tests/ui/               BrowserOS Neo test plan and recorded results
+├─ docs/
+│  ├─ event/               EVENT.md (summary), instruction.md (the site's instructions and sponsor ideas)
+│  ├─ design/              DESIGN.md (UI and motion), COPY.md (UX copy)
+│  ├─ research/            sponsors.md (integration notes)
+│  ├─ runbooks/            one per deliberate failure
+│  ├─ demo/                pr-log, usage-log, before/after charts, screenshots
+│  ├─ ACCESSIBILITY.md     (planned) WCAG 2.2 AA checklist with evidence
+│  └─ assets/              event banner (metadata stripped)
+├─ plans/                  board.html, the published plan board
+├─ tools/                  qr-decode.swift, strip-metadata.swift
+├─ .github/workflows/      CI: swift build, swift test, relevance gate, image build
+├─ .gitar/review/          Gitar review instructions and repository rules
+└─ .agents/                AI team coordination (STATE.md, ORIGINAL_REQUEST.md, per-role notes); metadata only
 ```
 
 ## Roadmap

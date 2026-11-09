@@ -15,21 +15,43 @@ Hallway Track searches conference sessions with natural language or keywords and
 | Sonar: Never Merge Broken | Changes land through reviewed PRs with CI |
 | Merge Forward: Conferences for Everyone | Accessibility filters, and a UI built to be keyboard and screen-reader friendly |
 
-Architecture: see [ARCHITECTURE.md](ARCHITECTURE.md). Event rules and criteria: [docs/EVENT.md](docs/EVENT.md).
+Architecture: see [ARCHITECTURE.md](ARCHITECTURE.md). Event rules and criteria: [docs/event/EVENT.md](docs/event/EVENT.md).
 
 ## Repository layout
 ```
-ARCHITECTURE.md     system topology and constraints
-docs/EVENT.md       event details, rules, judging criteria
-docs/DESIGN.md      UI design and motion plan
-docs/COPY.md        UX copy
-swift-server/       Swift (Vapor) server and HTMX front end, built from the PerksMix starter
-data/sessions.json  60 fictional conference sessions (seed data, no real people)
-instruction.md      the event website's instructions, rules and track setup
-plans/board.html    the team's time plan
-research/           sponsor integration notes
-tools/              small helpers (QR decoder used to read the event banner)
-.agents/            coordination notes from the AI agent team (metadata only)
+Hackathon-Slc/
+├─ README.md               what this is, track map, AI disclosure, starter-template note
+├─ ARCHITECTURE.md         topology, constraints, layout, roadmap
+├─ BUILD.md                (planned) install, configure, index, run, test, deploy
+├─ EXPLAIN.md              the human team member's own explanations (rule 6)
+├─ .env.example            variable names only; the real .env is gitignored
+├─ swift-server/           Swift on SwiftNIO server + HTMX front end (starter d127f28, then trimmed)
+│  ├─ Package.swift
+│  ├─ Sources/App/         routes, search backends, telemetry, views
+│  ├─ Sources/Indexer/     (planned) loads data/sessions.json into Elasticsearch
+│  ├─ Tests/               server tests (swift test)
+│  ├─ Public/              HTMX pages, CSS, vendored htmx and Dash0 web SDK
+│  └─ Dockerfile
+├─ data/                   sessions.json: 60 fictional sessions
+├─ eval/                   relevance queries, runner, REPORT.md, CI gate baseline
+├─ deploy/
+│  ├─ k8s/                 manifests: probes, autoscaler, disruption budget
+│  ├─ argocd/              Argo CD application (push deploys)
+│  └─ dash0/               SLO, dashboards, alerts, synthetic checks as YAML
+├─ tests/ui/               BrowserOS Neo test plan and recorded results
+├─ docs/
+│  ├─ event/               EVENT.md (summary), instruction.md (the site's instructions and sponsor ideas)
+│  ├─ design/              DESIGN.md (UI and motion), COPY.md (UX copy)
+│  ├─ research/            sponsors.md (integration notes)
+│  ├─ runbooks/            one per deliberate failure
+│  ├─ demo/                pr-log, usage-log, before/after charts, screenshots
+│  ├─ ACCESSIBILITY.md     (planned) WCAG 2.2 AA checklist with evidence
+│  └─ assets/              event banner (metadata stripped)
+├─ plans/                  board.html, the published plan board
+├─ tools/                  qr-decode.swift, strip-metadata.swift
+├─ .github/workflows/      CI: swift build, swift test, relevance gate, image build
+├─ .gitar/review/          Gitar review instructions and repository rules
+└─ .agents/                AI team coordination (STATE.md, ORIGINAL_REQUEST.md, per-role notes); metadata only
 ```
 
 ## AI assistance disclosure

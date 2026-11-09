@@ -109,3 +109,27 @@ Kelsey Hightower (co-founder of KubeCon, retired Google Cloud Distinguished Engi
 - **Bring:** laptop, charger; accounts set up beforehand (see above).
 - **Food:** breakfast, lunch at 2:00 PM, coffee all day. (FAQ says breakfast at 10:00 AM; schedule says 9:00 AM.)
 - **Not on the site:** submission platform/form, demo-video requirement, presentation length.
+
+## Sponsor-suggested ideas (read directly from the event page, "Sponsors and ideas", 2026-11-09)
+These are examples, not requirements.
+
+**Dash0**
+- Self-diagnosing microservice app (storefront, booking system, chat app) instrumented end to end with OpenTelemetry, with a "chaos" button that injects latency or errors, then Agent0 finding the cause in the demo.
+- A live crowd map where check-ins become metrics and a Dash0 dashboard shows which rooms are filling up.
+- A schedule app instrumented end to end, where the demo shows Agent0 explaining why "My agenda" slowed down when everyone opened it after the keynote.
+- An AI assistant for attendees traced with OpenLIT, so every LLM call, token and cost shows in Dash0.
+
+**Sonar (Gitar)**
+- A schedule builder where every feature lands through a Gitar-reviewed PR, with review instructions that make sure session times always handle time zones properly.
+- A repository rule that kicks in whenever the API changes and checks the frontend still matches it.
+- Breaking CI on purpose and letting auto-apply fix it live during the demo.
+
+**Elasticsearch**
+- A talk search where "something on eBPF and security" finds the right session even when those words aren't in the title.
+- A hallway matchmaker that stores what everyone is working on as vectors and finds the closest matches in the building.
+- A conference assistant that answers questions about the schedule using RAG over every talk abstract.
+
+**Radar (any of these on Kubernetes)**
+- Talk picker: reads your GitHub, builds your schedule and reshuffles it when a room fills up.
+- Hallway track matchmaker: finds the people in the building working on the same problem as you.
+- Live crowd map: shows which rooms are packed and which coffee line is shortest.
