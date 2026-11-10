@@ -259,3 +259,8 @@ html[data-font="dyslexia"] body {
 .agenda-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .agenda-list li { display: flex; gap: .5rem; align-items: baseline; font-size: .9rem; }
 .agenda-list .btn { flex: none; }
+
+/* PWA: offline notice (literal colours so it reads the same in light, dark and forced-colors) */
+.offline-note { padding: .5rem 1rem; text-align: center; font-size: .9rem; background: #fff4d6; color: #3a2a00; border-bottom: 2px solid #c58a00; }
+.offline-note[hidden] { display: none; }
+@media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top, 0); } }

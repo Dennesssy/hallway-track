@@ -573,4 +573,31 @@
   var dashScript = document.querySelector('script[src*="dash0-web"]');
   if (dashScript) dashScript.addEventListener("load", initDash0);
   else initDash0();
+
+  // ---------- PWA: service worker + offline notice ----------
+  // Service workers need a secure context: https, or localhost during development.
+  if ("serviceWorker" in navigator) {
+    var secureOrigin = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (secureOrigin) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function () { /* the app works without it */ });
+      });
+    }
+  }
+  function setOfflineNote(offline) {
+    var note = $("#offline-note");
+    if (!note) {
+      note = document.createElement("div");
+      note.id = "offline-note";
+      note.className = "offline-note";
+      note.setAttribute("role", "status");
+      note.hidden = true;
+      document.body.insertBefore(note, document.body.firstChild);
+    }
+    note.textContent = offline ? "You're offline. Showing the last results we loaded." : "";
+    note.hidden = !offline;
+  }
+  window.addEventListener("offline", function () { setOfflineNote(true); });
+  window.addEventListener("online", function () { setOfflineNote(false); runSearch(true); });
+  if (navigator.onLine === false) setOfflineNote(true);
 })();
