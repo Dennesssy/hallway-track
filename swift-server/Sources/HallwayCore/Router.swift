@@ -85,6 +85,8 @@ public enum Server {
                 }
             }
             // URLSession probe: bypasses NIO entirely (Network.framework path).
+            // Darwin-only: swift-corelibs-foundation's URLSession has no .shared/data(from:).
+#if canImport(Darwin)
             do {
                 let (data, resp) = try await URLSession.shared.data(from: URL(string: "https://example.com/")!)
                 out["urlsession_example"] = (resp as? HTTPURLResponse)?.statusCode ?? -1
@@ -92,6 +94,9 @@ public enum Server {
             } catch {
                 out["urlsession_error"] = "\(error)"
             }
+#else
+            out["urlsession_example"] = "skipped (non-Darwin)"
+#endif
             return Response.json(out)
         }
         // Keynote Rush trigger (R22): fires a real burst of simulated traffic.
