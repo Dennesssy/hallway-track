@@ -24,9 +24,21 @@ public struct Config: Sendable {
     public var faultESUnreachable: Bool
     public var maxAgendaPerDevice: Int
 
+    public init() {
+        port = 8080; host = "0.0.0.0"; backendOverride = nil
+        publicDir = "swift-server/Public"; dataFile = "data/sessions.json"
+        elasticURL = nil; elasticAPIKey = nil
+        elasticIndex = "sessions"
+        elasticInferenceID = ".jina-embeddings-v5-text-nano"
+        elasticRerankID = ".jina-reranker-v3"
+        gitCommit = "unknown"; podName = ProcessInfo.processInfo.hostName
+        demoSlowMS = 1500; demoEnabled = true; timezone = "America/Denver"
+        chaosEnabled = false; faultLatencyMS = 0; faultESUnreachable = false
+        maxAgendaPerDevice = 100
+    }
+
     public static func load(env: [String: String] = ProcessInfo.processInfo.environment,
                             arguments: [String] = CommandLine.arguments) -> Config {
-        let fm = FileManager.default
         var cfg = Config()
         cfg.port = Int(env["PORT"] ?? "8080") ?? 8080
         cfg.host = env["HOST"] ?? "0.0.0.0"
@@ -65,7 +77,7 @@ public struct Config: Sendable {
     }
 
     public var publicDirectoryExists: Bool {
-        fm.fileExists(atPath: publicDir)
+        FileManager.default.fileExists(atPath: publicDir)
     }
 
     public var logger: Logger {

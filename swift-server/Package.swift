@@ -36,7 +36,7 @@ let package = Package(
         .executableTarget(
             name: "App",
             dependencies: [
-                .product(name: "HallwayCore", package: "hallway-track"),
+                "HallwayCore",
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
@@ -51,7 +51,7 @@ let package = Package(
         .executableTarget(
             name: "Indexer",
             dependencies: [
-                .product(name: "HallwayCore", package: "hallway-track"),
+                "HallwayCore",
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
                 .product(name: "Logging", package: "swift-log")
             ],
@@ -60,7 +60,7 @@ let package = Package(
         .testTarget(
             name: "HallwayTests",
             dependencies: [
-                .product(name: "HallwayCore", package: "hallway-track"),
+                "HallwayCore",
                 .product(name: "NIOPosix", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
                 .product(name: "NIOEmbedded", package: "swift-nio")

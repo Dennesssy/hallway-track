@@ -2,13 +2,15 @@ import Foundation
 import HallwayCore
 import AsyncHTTPClient
 import Logging
+import NIOPosix
 
 /// Indexer: loads data/sessions.json and pushes it to Elasticsearch.
 /// Usage: hallway-index [--file path] [--recreate]
 @main
 struct IndexerMain {
     static func main() async throws {
-        var file = "data/sessions.json"
+        let config = Config.load()
+        var file = config.dataFile
         var recreate = false
         var args = CommandLine.arguments.dropFirst()
         while let a = args.popFirst() {
@@ -18,7 +20,6 @@ struct IndexerMain {
             default: break
             }
         }
-        let config = Config.load()
         let logger = config.logger
 
         guard config.elasticConfigured else {

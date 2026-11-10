@@ -43,13 +43,59 @@ public struct Session: Codable, Sendable, Equatable {
         case durationMin = "duration_min"
     }
 
+    public init(id: String, title: String, abstractText: String, speaker: String,
+                track: String, level: String, day: Int, start: String,
+                durationMin: Int, room: String, tags: [String],
+                accessibility: Accessibility, lang: String = "en",
+                timezone: String = "America/Denver") {
+        self.id = id; self.title = title; self.abstractText = abstractText
+        self.speaker = speaker; self.track = track; self.level = level
+        self.day = day; self.start = start; self.durationMin = durationMin
+        self.room = room; self.tags = tags; self.accessibility = accessibility
+        self.lang = lang; self.timezone = timezone
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        abstractText = try c.decode(String.self, forKey: .abstractText)
+        speaker = try c.decode(String.self, forKey: .speaker)
+        track = try c.decode(String.self, forKey: .track)
+        level = try c.decode(String.self, forKey: .level)
+        day = try c.decode(Int.self, forKey: .day)
+        start = try c.decode(String.self, forKey: .start)
+        durationMin = try c.decode(Int.self, forKey: .durationMin)
+        room = try c.decode(String.self, forKey: .room)
+        tags = try c.decode([String].self, forKey: .tags)
+        accessibility = try c.decode(Accessibility.self, forKey: .accessibility)
+        lang = try c.decodeIfPresent(String.self, forKey: .lang) ?? "en"
+        timezone = try c.decodeIfPresent(String.self, forKey: .timezone) ?? "America/Denver"
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(title, forKey: .title)
+        try c.encode(abstractText, forKey: .abstractText)
+        try c.encode(speaker, forKey: .speaker)
+        try c.encode(track, forKey: .track)
+        try c.encode(level, forKey: .level)
+        try c.encode(day, forKey: .day)
+        try c.encode(start, forKey: .start)
+        try c.encode(durationMin, forKey: .durationMin)
+        try c.encode(room, forKey: .room)
+        try c.encode(tags, forKey: .tags)
+        try c.encode(accessibility, forKey: .accessibility)
+        try c.encode(lang, forKey: .lang)
+        try c.encode(timezone, forKey: .timezone)
+    }
     public static func minutes(_ hhmm: String) -> Int {
         let parts = hhmm.split(separator: ":")
         guard parts.count == 2, let h = Int(parts[0]), let m = Int(parts[1]) else { return 0 }
         return h * 60 + m
     }
 
-    /// Inclusive end minute of the talk on its day.
     public var endMin: Int { Self.minutes(start) + durationMin }
 
     /// Sort key used by "no query" listings.
@@ -87,8 +133,8 @@ public struct SearchFilters: Sendable, Equatable {
     ]
 
     public static let tracks: Set<String> = [
-        "Security", "DevEx", "Platform", "Observability", "AI/ML",
-        "Networking", "Edge", "Community", "FinOps", "Storage"
+        "AI/ML on Kubernetes", "Community", "Developer Experience", "Edge", "FinOps",
+        "Networking", "Observability", "Platform Engineering", "Security", "Storage"
     ]
 
     public static let levels: Set<String> = ["beginner", "intermediate", "advanced"]

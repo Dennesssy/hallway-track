@@ -12,11 +12,32 @@ public enum Server {
         let r = Router()
         registerCoreRoutes(r, context: context)
         registerAPIRoutes(r, context: context)
-        registerUITestRoutes(r, context: context)   // HTML fragments for tests
+        registerUIViewRoutes(r, context: context)   // HTML fragments for htmx
         return r
     }
 
     private static func registerCoreRoutes(_ r: Router, context ctx: AppContext) {
+        // Home page: full shell with server-rendered initial results (works
+        // with or without JavaScript; the same fragments drive htmx).
+        r.get("/") { req in
+            let indexURL = URL(fileURLWithPath: ctx.config.publicDir).appendingPathComponent("index.html")
+            guard let data = try? Data(contentsOf: indexURL),
+                  let html = String(data: data, encoding: .utf8) else {
+                return .notFound()
+            }
+            let filters: SearchFilters
+            do { filters = try parseSearchFilters(req) }
+            catch { filters = SearchFilters() }
+            let resp = await ctx.search.search(filters)
+            return Response.html(HTMLView.inject(
+                html: html,
+                cards: HTMLView.cardsBody(resp: resp, filters: filters, fill: ctx.roomFill),
+                countP: HTMLView.countP(resp: resp, filters: filters),
+                interpretedP: HTMLView.interpretedP(resp: resp, filters: filters),
+                fallbackP: HTMLView.fallbackP(resp: resp),
+                trackOptions: HTMLView.trackOptions(selected: filters.track)
+            ))
+        }
         r.get("/healthz") { _ in
             Response.json(["status": "ok"])
         }
@@ -116,6 +137,16 @@ public enum Server {
             }
             return Response.json(["ok": false, "reason": "no alternative in slot"])
         }
+        // My agenda HTML page (R16). Device id comes from query or defaults to anon;
+        // the JS client sends its localStorage id.
+        r.get("/agenda") { req in
+            let device = req.query["device"] ?? "anon"
+            let sessions = ctx.agendaStore.sessions(for: device, store: ctx.store)
+            let clashes = ctx.agendaStore.clashes(sessions)
+            return Response.html(HTMLView.agendaPage(sessions: sessions, clashes: clashes,
+                                                     tz: ctx.config.timezone, device: device))
+        }
+
     }
 
     private static func sessionJSON(_ s: Session) -> [String: Any] {
@@ -270,13 +301,44 @@ public enum Server {
         return f
     }
 
-    /// /ui/* endpoints return HTML fragments for htmx. These are thin wrappers
-    //  over the JSON paths so tests can assert on markup.
-    private static func registerUITestRoutes(_ r: Router, context ctx: AppContext) {
+    /// /ui/* endpoints return HTML fragments for htmx (see HTMLView).
+    private static func registerUIViewRoutes(_ r: Router, context ctx: AppContext) {
         r.get("/ui/results") { req in
-            // Rendered by Views in the app target; here we return a placeholder
-            // that tests can match. The real implementation lives in App.
-            Response.text("UI results fragment (implemented in App target)")
+            do {
+                let f = try parseSearchFilters(req)
+                let resp = await ctx.search.search(f)
+                let traceID = req.headers["x-trace-id"] ?? "trace-\(UUID().uuidString.prefix(8).lowercased())"
+                let trigger: [String: Any] = ["search-done": [
+                    "latency_ms": resp.latencyMS,
+                    "trace_id": traceID,
+                    "backend": resp.backend,
+                    "semantic_mode": resp.semanticMode ?? NSNull()
+                ]]
+                let payload = (try? JSONSerialization.data(withJSONObject: trigger)) ?? Data()
+                let hxTrigger = String(data: payload, encoding: .utf8) ?? ""
+                var headers = ["HX-Trigger": hxTrigger, "X-Backend": resp.backend]
+                if resp.fallbackReason != nil { headers["X-Fallback"] = "memory" }
+                return Response.html(HTMLView.resultsFragment(resp: resp, filters: f, fill: ctx.roomFill), headers: headers)
+            } catch let e as SearchFilters.ParameterError {
+                return Response.html(HTMLView.badInputFragment(message: e.message), status: .badRequest)
+            } catch {
+                return Response.html(HTMLView.unavailableFragment(), status: .serviceUnavailable)
+            }
+        }
+
+        r.get("/ui/query") { req in
+            do {
+                let f = try parseSearchFilters(req)
+                let resp = await ctx.search.search(f)
+                return Response.html(HTMLView.queryDialogHTML(req: req, resp: resp, filters: f))
+            } catch {
+                return Response.html("<dialog open class=\"dialog\"><p>Search isn't available right now.</p></dialog>",
+                                     status: .serviceUnavailable)
+            }
+        }
+
+        r.get("/ui/meta") { _ in
+            Response.html(HTMLView.metaHTML(ctx: ctx))
         }
     }
 }

@@ -2,7 +2,8 @@ import Foundation
 import AsyncHTTPClient
 import Logging
 import NIOCore
-
+import NIOHTTP1
+import NIOPosix
 /// Elasticsearch backend: real hybrid search over the `sessions` index.
 /// BM25 + semantic_text fused by RRF, optional Jina reranker on top.
 /// Every backend call is timed separately so traces can name the slow span (R22).
@@ -22,14 +23,28 @@ public final class ElasticClient: @unchecked Sendable {
     public var baseURL: String { config.elasticURL!.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }
     public var index: String { config.elasticIndex }
 
-    private func request(_ method: HTTPRequest.Method, _ path: String,
+    private func bbToString(_ buf: ByteBuffer?) -> String {
+        guard var buf else { return "" }
+        return buf.readString(length: buf.readableBytes) ?? ""
+    }
+    private func bbToData(_ buf: ByteBuffer) -> Data {
+        var b = buf
+        return Data(b.readableBytesView)
+    }
+
+    private func request(_ method: HTTPMethod, _ path: String,
                          body: String? = nil) -> HTTPClientRequest {
-        var req = HTTPClientRequest(method: method, url: baseURL + path)
+        var req = HTTPClientRequest(url: baseURL + path)
+        req.method = method
         req.headers.add(name: "Authorization", value: "ApiKey \(config.elasticAPIKey!)")
         req.headers.add(name: "Accept", value: "application/json")
         req.headers.add(name: "Content-Type", value: "application/json")
         req.headers.add(name: "User-Agent", value: "hallway-track/1.0")
-        if let body { req.body = .string(body) }
+        if let body {
+            var buf = ByteBuffer()
+            buf.writeString(body)
+            req.body = .bytes(buf)
+        }
         return req
     }
 
@@ -78,7 +93,7 @@ public final class ElasticClient: @unchecked Sendable {
         let resp = try await http.execute(req, timeout: .seconds(30))
         if resp.status.code >= 400 {
             let body = try? await resp.body.collect(upTo: 1 << 20)
-            throw ElasticError.http(resp.status.code, String(buffer: body ?? ByteBuffer(), encoding: .utf8) ?? "")
+            throw ElasticError.http(Int(resp.status.code), bbToString(body))
         }
     }
 
@@ -92,7 +107,7 @@ public final class ElasticClient: @unchecked Sendable {
         let resp = try await http.execute(req, timeout: .seconds(10))
         guard resp.status.code == 200 else { return 0 }
         let buf = try await resp.body.collect(upTo: 1 << 20)
-        guard let json = try? JSONSerialization.jsonObject(with: Data(buffer: buf)) as? [String: Any],
+        guard let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
               let count = json["count"] as? Int else { return 0 }
         return count
     }
@@ -132,13 +147,13 @@ public final class ElasticClient: @unchecked Sendable {
             payload += String(data: indexLine, encoding: .utf8)! + "\n"
             payload += String(data: docLine, encoding: .utf8)! + "\n"
         }
-        let req = request(.POST, "/\(index)/_bulk?refresh=true", body: payload)
+        var req = request(.POST, "/\(index)/_bulk?refresh=true", body: payload)
         req.headers.replaceOrAdd(name: "Content-Type", value: "application/x-ndjson")
         let resp = try await http.execute(req, timeout: .seconds(60))
         let buf = try await resp.body.collect(upTo: 4 << 20)
-        let bodyStr = String(buffer: buf, encoding: .utf8) ?? ""
+        let bodyStr = bbToString(buf)
         guard resp.status.code == 200 else {
-            throw ElasticError.http(resp.status.code, bodyStr)
+            throw ElasticError.http(Int(resp.status.code), bodyStr)
         }
         // Verify no per-doc errors
         if let json = try? JSONSerialization.jsonObject(with: Data(bodyStr.utf8)) as? [String: Any],
@@ -215,8 +230,7 @@ public final class ElasticClient: @unchecked Sendable {
 
         // Optional reranker (top N).
         if config.elasticConfigured, !f.q.isEmpty, !hits.isEmpty {
-            let (reranked, rms) = try? await rerank(query: f.q, hits: hits)
-            if let reranked {
+            if let (reranked, rms) = try? await rerank(query: f.q, hits: hits), let reranked {
                 hits = reranked
                 timings.rerankMs = rms ?? 0
                 timings.backendCalls += 1
@@ -265,7 +279,7 @@ public final class ElasticClient: @unchecked Sendable {
         let ms = Double(DispatchTime.now().uptimeNanoseconds - t0) / 1_000_000
         guard resp.status.code == 200 else {
             let b = try? await resp.body.collect(upTo: 1 << 20)
-            throw ElasticError.http(resp.status.code, String(buffer: b ?? ByteBuffer(), encoding: .utf8) ?? "")
+            throw ElasticError.http(Int(resp.status.code), bbToString(b))
         }
         let buf = try await resp.body.collect(upTo: 4 << 20)
         return (parseHits(buf), ms)
@@ -295,12 +309,12 @@ public final class ElasticClient: @unchecked Sendable {
         let ms = Double(DispatchTime.now().uptimeNanoseconds - t0) / 1_000_000
         guard resp.status.code == 200 else {
             let b = try? await resp.body.collect(upTo: 1 << 20)
-            throw ElasticError.http(resp.status.code, String(buffer: b ?? ByteBuffer(), encoding: .utf8) ?? "")
+            throw ElasticError.http(Int(resp.status.code), bbToString(b))
         }
         let buf = try await resp.body.collect(upTo: 4 << 20)
         // For semantic we parse raw hits; we only need ids+scores here.
         var hits: [String: Double] = [:]
-        if let json = try? JSONSerialization.jsonObject(with: Data(buffer: buf)) as? [String: Any],
+        if let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
            let hitsArr = (json["hits"] as? [String: Any])?["hits"] as? [[String: Any]] {
             for h in hitsArr {
                 if let id = (h["_source"] as? [String: Any])?["id"] as? String,
@@ -345,7 +359,7 @@ public final class ElasticClient: @unchecked Sendable {
     /// Parse ES hits into id->score and collect highlights.
     private func parseHits(_ buf: ByteBuffer) -> [String: Double] {
         var hits: [String: Double] = [:]
-        guard let json = try? JSONSerialization.jsonObject(with: Data(buffer: buf)) as? [String: Any],
+        guard let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
               let arr = (json["hits"] as? [String: Any])?["hits"] as? [[String: Any]] else { return hits }
         for h in arr {
             if let id = (h["_source"] as? [String: Any])?["id"] as? String,
@@ -405,7 +419,7 @@ public final class ElasticClient: @unchecked Sendable {
         let ms = Double(DispatchTime.now().uptimeNanoseconds - t0) / 1_000_000
         guard resp.status.code == 200 else { return (nil, ms) }
         let buf = try await resp.body.collect(upTo: 2 << 20)
-        guard let json = try? JSONSerialization.jsonObject(with: Data(buffer: buf)) as? [String: Any],
+        guard let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
               let rerank = json["rerank"] as? [[String: Any]] else { return (nil, ms) }
         var reordered: [SearchHit] = []
         for item in rerank {
@@ -447,10 +461,10 @@ public final class ElasticClient: @unchecked Sendable {
         let resp = try await http.execute(req, timeout: .seconds(15))
         guard resp.status.code == 200 else {
             let b = try? await resp.body.collect(upTo: 1 << 20)
-            throw ElasticError.http(resp.status.code, String(buffer: b ?? ByteBuffer(), encoding: .utf8) ?? "")
+            throw ElasticError.http(Int(resp.status.code), bbToString(b))
         }
         let buf = try await resp.body.collect(upTo: 4 << 20)
-        return (try? JSONSerialization.jsonObject(with: Data(buffer: buf)) as? [String: Any]) ?? [:]
+        return (try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any]) ?? [:]
     }
 }
 

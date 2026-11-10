@@ -1,4 +1,5 @@
 import Foundation
+import HallwayCore
 import NIOCore
 import NIOPosix
 import NIOHTTP1
@@ -48,8 +49,6 @@ struct HallwayMain {
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
                 let httpHandler = HTTPHandler(router: router, context: ctx)
-                let aggregator = ByteBufferFrameDecoder(base: HTTPHeadersEncoder())  // placeholder; we'll do manual
-                _ = aggregator
                 let pipeline = channel.pipeline
                 return pipeline.configureHTTPServerPipeline(withPipeliningAssistance: false).flatMap {
                     pipeline.addHandler(httpHandler)
@@ -63,8 +62,8 @@ struct HallwayMain {
         // Graceful shutdown on SIGINT/SIGTERM
         let sigint = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
         let sigterm = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
-        sigint.setEventHandler { Task { await channel.close().get() ; exit(0) } }
-        sigterm.setEventHandler { Task { await channel.close().get() ; exit(0) } }
+        sigint.setEventHandler { Task { try? await channel.close().get() ; exit(0) } }
+        sigterm.setEventHandler { Task { try? await channel.close().get() ; exit(0) } }
         sigint.resume(); sigterm.resume()
         // Ignore default handlers
         signal(SIGINT, SIG_IGN); signal(SIGTERM, SIG_IGN)

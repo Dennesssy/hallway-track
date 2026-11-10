@@ -15,9 +15,12 @@ public final class MemoryBackend: @unchecked Sendable {
         var hits: [SearchHit] = []
 
         if q.isEmpty && !f.quietRoute {
-            hits = store.sessions.filter { filterMatch($0, f) }.map { s in
-                SearchHit(session: s, match: nil, score: 0, highlights: [:])
-            }.sorted { $0.session.sortKey < $1.session.sortKey }
+            hits = store.sessions.filter { filterMatch($0, f) }
+                .sorted { $0.sortKey < $1.sortKey }
+                .prefix(f.limit)
+                .map { s in
+                    SearchHit(session: s, match: nil, score: 0, highlights: [:])
+                }
         } else {
             let qTerms = terms(q)
             let scored = store.sessions.compactMap { s -> (Session, Double)? in

@@ -64,7 +64,6 @@ public struct Request: Sendable {
         self.body = body
         self.remoteAddress = remoteAddress
     }
-
     public subscript(_ name: String) -> String? { query[name] }
 
     public func queryValues(_ name: String) -> [String] {
@@ -105,7 +104,7 @@ public struct Response: Sendable {
         return Response(status: status, headers: h, body: buf)
     }
 
-    public static func json(_ obj: Any, status: HTTPResponseStatus = .ok) -> Response {
+    public static func json(_ obj: Any, status: HTTPResponseStatus = .ok, headers: [String: String] = [:]) -> Response {
         let data: Data
         do {
             data = try JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys])
@@ -114,7 +113,9 @@ public struct Response: Sendable {
         }
         var buf = ByteBuffer()
         buf.writeBytes(data)
-        return Response(status: status, headers: ["Content-Type": "application/json"], body: buf)
+        var h = headers
+        h["Content-Type"] = "application/json"
+        return Response(status: status, headers: h, body: buf)
     }
 
     public static func errorJSON(code: String, message: String, status: HTTPResponseStatus, param: String? = nil) -> Response {

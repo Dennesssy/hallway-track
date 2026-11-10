@@ -56,13 +56,18 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
             }
         case .end:
             let req = makeRequest()
+            let el = context.eventLoop
             Task { [weak self] in
                 guard let self else { return }
                 do {
                     let resp = try await self.dispatch(req)
-                    self.writeResponse(resp, context: context)
+                    el.execute {
+                        self.writeResponse(resp, context: context)
+                    }
                 } catch {
-                    self.writeResponse(.errorJSON(code: "internal", message: "Internal error", status: .internalServerError), context: context)
+                    el.execute {
+                        self.writeResponse(.errorJSON(code: "internal", message: "Internal error", status: .internalServerError), context: context)
+                    }
                 }
             }
         }
@@ -171,7 +176,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         }
         context.write(NIOAny(HTTPServerResponsePart.head(head)), promise: nil)
         var body = resp.body
-        context.write(NIOAny(HTTPServerResponsePart.body(body)), promise: nil)
+        context.write(NIOAny(HTTPServerResponsePart.body(IOData.byteBuffer(body))), promise: nil)
         context.writeAndFlush(NIOAny(HTTPServerResponsePart.end(nil)), promise: nil)
     }
 }
