@@ -15,7 +15,7 @@ RUN swift build -c release --static-swift-stdlib -j 2
 RUN mkdir /stage \
     && cp "$(swift build -c release --show-bin-path)/hallway-track" /stage/ \
     && cp "$(swift build -c release --show-bin-path)/hallway-index" /stage/
-FROM debian:bookworm-slim
+FROM ubuntu:24.04
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libjemalloc2 ca-certificates tzdata curl \
     && rm -rf /var/lib/apt/lists/* \
