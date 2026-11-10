@@ -86,9 +86,17 @@
   }
 
   // ---- agenda (localStorage) ----
+  var memoryAgenda = {};   // used when localStorage is blocked, so adds still show for this page view
   function agendaKey(device) { return "ht.demo.agenda." + (device || "device"); }
-  function readAgenda(device) { try { return JSON.parse(localStorage.getItem(agendaKey(device)) || "[]"); } catch (e) { return []; } }
-  function writeAgenda(device, ids) { try { localStorage.setItem(agendaKey(device), JSON.stringify(ids)); } catch (e) { /* storage blocked: agenda lasts this page view only */ } }
+  function readAgenda(device) {
+    if (memoryAgenda[device]) return memoryAgenda[device].slice();   // authoritative within this page view
+    try { return JSON.parse(localStorage.getItem(agendaKey(device)) || "[]"); }
+    catch (e) { return (memoryAgenda[device] || []).slice(); }
+  }
+  function writeAgenda(device, ids) {
+    memoryAgenda[device] = ids.slice();
+    try { localStorage.setItem(agendaKey(device), JSON.stringify(ids)); } catch (e) { /* storage blocked: memory copy above keeps it for this page view */ }
+  }
   function agendaSessions(all, ids) {
     return ids.map(function (id) { return all.filter(function (s) { return s.id === id; })[0]; }).filter(Boolean);
   }

@@ -38,6 +38,8 @@ jobs:
           # before the app, and drop the RUM script (no Dash0 token in a public static demo).
           sed -i \
             -e 's#href="/app.css"#href="./app.css"#' \
+            -e 's#action="/"#action="./"#' \
+            -e 's#href="/?demo=1\#top"#href="./?demo=1\#top"#' \
             -e 's#<script src="/app.js" defer></script>#<script src="./demo-shim.js"></script><script src="./app.js" defer></script>#' \
             -e '/dash0-web.js/d' \
             site/index.html
