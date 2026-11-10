@@ -17,9 +17,9 @@ if judges need access (`gh repo edit Dennesssy/hallway-track --visibility public
 | S2 | ES hybrid search + memory fallback | done | BM25+semantic_text RRF+Jina rerank; eval elastic MRR 0.869 |
 | S3 | Front end (static HTML+JS, vendored htmx) | done | search/filters/agenda/ops strip, noscript SSR via HTMLView.inject |
 | S4/S5 | A11y + UI evidence | done | docs/ACCESSIBILITY.md, tests/ui/CHECKLIST.md |
-| S6 | Relevance suite + CI gate | done | eval/{queries.json,run.sh,baseline.json,REPORT.md}, .github/workflows/relevance.yml |
+| S6 | Relevance suite + CI gate | done — verified in-cluster | eval/{queries.json,run.sh,baseline.json,REPORT.md}; run vs k8s svc: hit@10 37/38, MRR 0.8678, nDCG 0.8827, gate passed |
 | S7 | OTel → Dash0 | code done; export unverified (macOS outbound bug) | Telemetry.swift; OTLPHTTP-only trait fix committed; verify in container |
-| S8 | Container + k8s + ArgoCD | manifests applied to OrbStack; image build in progress | deploy/{k8s,argocd,dash0}, swift-server/Dockerfile; pods ImagePullBackOff until image exists |
+| S8 | Container + k8s + ArgoCD | DONE — verified in OrbStack | pods Ready 2/2, backend=elastic live search, indexer job 60 docs, all endpoints 200; image ghcr.io/hallway/hallway-track:latest (local build) |
 | S9 | Faults + runbooks | done | FAULT_*/CHAOS env, ?demo=1, /api/rush, docs/runbooks/* |
 | S10 | CI + Gitar | done | .github/workflows/ci.yml, .gitar/{rules,review,instructions,config} |
 | S11 | Keynote Rush evidence | done (memory backend) | docs/demo/rush-before-after.md real measurements; usage-log.md; pr-log.md rewritten to match actual PRs |
@@ -43,8 +43,11 @@ s6-eval · s7-s9-deploy · chore/gitar-config
        (AHC EBADF + URLSession -1005) even signed, no-grpc, OTel-disabled,
        minimal probe (Config.load+HTTPClient only). Minimal NIO+AHC repro
        with same deps WORKS — suspect is something in the full binary link.
-       Unverified whether Linux container is affected — docker image build
-       in progress; k8s pods will prove it.
+   (c) STILL OPEN (macOS-only): hallway-track server binary on macOS still
+       fails outbound (AHC EBADF + URLSession -1005) even signed, no-grpc,
+       OTel-disabled, minimal probe. Minimal NIO+AHC repro with same deps
+       WORKS — unresolved macOS 27 quirk. **Linux container VERIFIED WORKING**:
+       k8s pods search ES live (backend=elastic), indexer pushed 60 docs.
 2. `.env` OTEL_EXPORTER_OTLP_HEADERS needed quotes (space in "Bearer …") —
    fixed locally; k8s Secret must carry the full value.
 3. Repo visibility: still private.

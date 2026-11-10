@@ -7,3 +7,9 @@
 !swift-server/Tests
 !swift-server/Public
 !data/sessions.json
+!swift-server/.build
+!swift-server/.build/out
+!swift-server/.build/out/Products
+!swift-server/.build/out/Products/Release-linux-aarch64
+!swift-server/.build/out/Products/Release-linux-aarch64/hallway-track
+!swift-server/.build/out/Products/Release-linux-aarch64/hallway-index

@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Local-only variant: packages prebuilt Linux binaries from the host .build dir.
+# Used when the full Swift toolchain build can't run inside the VM.
+#   docker run --rm -v "$PWD/swift-server:/src" -w /src swift:6.4-noble \
+#     swift build -c release --static-swift-stdlib -j 2
+FROM ubuntu:24.04
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libjemalloc2 ca-certificates tzdata curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --create-home --home-dir /app --shell /usr/sbin/nologin hallway \
+    && mkdir -p /app/data && chown hallway /app/data
+WORKDIR /app
+COPY swift-server/.build/out/Products/Release-linux-aarch64/hallway-track ./hallway-track
+COPY swift-server/.build/out/Products/Release-linux-aarch64/hallway-index ./hallway-index
+COPY swift-server/Public ./Public
+COPY data/sessions.json ./data/sessions.json
+USER hallway
+ENV PORT=8080 \
+    HOST=0.0.0.0 \
+    PUBLIC_DIR=/app/Public \
+    SESSIONS_JSON=/app/data/sessions.json
+EXPOSE 8080
+ENTRYPOINT ["/app/hallway-track"]
