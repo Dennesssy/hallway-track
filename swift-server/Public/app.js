@@ -383,11 +383,14 @@
       var openDlg = $("dialog[open]");
       if (openDlg && typeof openDlg.close === "function") openDlg.close();
     }
-    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && document.activeElement === $("#results")) {
+    var ae = document.activeElement, resultsEl = $("#results");
+    // Arrow keys work from the results region and from any card inside it, not only on first focus.
+    var inResults = !!ae && !!resultsEl && (ae === resultsEl || (ae.classList && ae.classList.contains("card") && resultsEl.contains(ae)));
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && inResults) {
       var cards = $$("#results .card");
       if (!cards.length) return;
       e.preventDefault();
-      var idx = cards.indexOf(document.activeElement);
+      var idx = cards.indexOf(ae);
       var next = e.key === "ArrowDown" ? Math.min(idx + 1, cards.length - 1) : Math.max(idx - 1, 0);
       cards[next].focus();
     }

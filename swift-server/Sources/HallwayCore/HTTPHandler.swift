@@ -25,6 +25,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     private var headers: [String: String] = [:]
     private var bodyBuffer: ByteBuffer?
     private var bodyBytes = 0
+    private var bodyTooLarge = false
     private let maxBodyBytes = 1 << 20  // 1 MiB
 
     public init(router: Router, context: AppContext) {
@@ -48,15 +49,23 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
                 headers[h.name.lowercased()] = h.value
             }
             bodyBytes = 0
+            bodyTooLarge = false
+            bodyBuffer = context.channel.allocator.buffer(capacity: 0)   // fresh buffer per request (keep-alive safe)
         case .body(var buf):
             bodyBytes += buf.readableBytes
             if bodyBytes <= maxBodyBytes {
                 bodyBuffer?.writeBuffer(&buf)
             } else {
-                // Too large: mark by emptying
+                bodyTooLarge = true
                 bodyBuffer = nil
             }
         case .end:
+            if bodyTooLarge {
+                var tooLarge = Response.errorJSON(code: "payload_too_large", message: "Request body too large", status: .payloadTooLarge)
+                applySecurityHeaders(&tooLarge)
+                writeResponse(tooLarge, context: context)
+                return
+            }
             let req = makeRequest()
             let el = context.eventLoop
             Task { [weak self] in
@@ -68,7 +77,9 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
                     }
                 } catch {
                     el.execute {
-                        self.writeResponse(.errorJSON(code: "internal", message: "Internal error", status: .internalServerError), context: context)
+                        var failed = Response.errorJSON(code: "internal", message: "Internal error", status: .internalServerError)
+                        self.applySecurityHeaders(&failed)
+                        self.writeResponse(failed, context: context)
                     }
                 }
             }
@@ -82,11 +93,18 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         if let qIdx = uri.firstIndex(of: "?") {
             path = String(uri[..<qIdx])
             let qs = String(uri[uri.index(after: qIdx)...])
-            for pair in qs.split(separator: "&") {
-                let kv = pair.split(separator: "=", maxSplits: 1)
-                let k = String(kv[0])
-                let v = kv.count > 1 ? String(kv[1]).removingPercentEncoding ?? String(kv[1]) : ""
-                query[k] = v
+            func decode(_ s: Substring) -> String {
+                let spaced = s.replacingOccurrences(of: "+", with: " ")
+                return spaced.removingPercentEncoding ?? spaced
+            }
+            for pair in qs.split(separator: "&", omittingEmptySubsequences: true) {
+                // omittingEmptySubsequences: false so "=" or "=x" gives an empty key instead of an empty array
+                let kv = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
+                guard let rawKey = kv.first, !rawKey.isEmpty else { continue }
+                let k = decode(rawKey)
+                let v = kv.count > 1 ? decode(kv[1]) : ""
+                // Repeated keys (flags=a&flags=b) are joined with "," so none are lost.
+                if let existing = query[k] { query[k] = existing + "," + v } else { query[k] = v }
             }
         }
         // Percent-decode path
@@ -103,9 +121,13 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         guard let route = router.match(method: req.method, path: req.path) else {
             // Static fallback for unknown paths under /vendor/ or assets
             if req.method == "GET" && (req.path.hasPrefix("/vendor/") || req.path.hasSuffix(".css") || req.path.hasSuffix(".js") || req.path.hasSuffix(".png") || req.path.hasSuffix(".svg") || req.path.hasSuffix(".ico")) {
-                return try await serveStatic(req.path)
+                var staticResp = try await serveStatic(req.path)
+                applySecurityHeaders(&staticResp)
+                return staticResp
             }
-            return .notFound()
+            var missing = Response.notFound()
+            applySecurityHeaders(&missing)
+            return missing
         }
         var resp = try await withSpan("http.\(req.method) \(req.path)", ofKind: .server) { span in
             span.updateAttributes { attrs in
