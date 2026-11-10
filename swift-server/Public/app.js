@@ -226,7 +226,7 @@
         }); }
         return r.json();
       })
-      .then(function (data) { renderResults(data); history.replaceState(null, "", "/?" + params(true).toString()); })
+      .then(function (data) { renderResults(data); history.replaceState(null, "", location.pathname + "?" + params(true).toString()); })
       .catch(function (e) { if (e.message === "503" || e.message === "bad") return; renderUnavailable(); })
       .then(function () { inFlight = false; if (loading) loading.hidden = true; });
   }
