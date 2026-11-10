@@ -1,6 +1,8 @@
 # Hallway Track
 
-Find the right conference talk, whoever you are. Built at the **Cloud Native Hackathon**, Salt Lake City, 9 Nov 2026.
+Find the right conference talk, whoever you are. Built at the **Cloud Native Hackathon**, Salt Lake City, 9 Nov 2026, by Dennis Stewart (Team Denn).
+
+**Demo video (2:58):** [watch or download](https://github.com/Dennesssy/hallway-track/releases/download/demo-video-1/hallway-track-final.mp4) · [release page](https://github.com/Dennesssy/hallway-track/releases/tag/demo-video-1). The slides are SVG, narration is NVIDIA Riva (Magpie multilingual TTS), and the video is rendered with Remotion; its source is in `video/` once the video pull request merges.
 
 Hallway Track searches conference sessions with natural language or keywords and filters them by what attendees need to take part: captions, sign language, step-free rooms, quiet rooms nearby and slides with alt text.
 
