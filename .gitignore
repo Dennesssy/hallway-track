@@ -19,3 +19,6 @@ swift-server/.build/
 *.sqlite-shm
 *.db
 pepper
+
+# generated relevance run output
+eval/results-*.json

@@ -1,0 +1,526 @@
+[
+ {
+  "id": "k01",
+  "q": "internal developer platform golden paths",
+  "expect": {
+   "must_include": [
+    "s001",
+    "s049"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k02",
+  "q": "paging rules on-call SLO burn rate",
+  "expect": {
+   "must_include": [
+    "s021"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k03",
+  "q": "passkeys phishing resistant sign-in",
+  "expect": {
+   "must_include": [
+    "s054"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k04",
+  "q": "FinOps unit economics cost per request",
+  "expect": {
+   "must_include": [
+    "s018"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k05",
+  "q": "CoreDNS DNS troubleshooting debugging",
+  "expect": {
+   "must_include": [
+    "s014"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k06",
+  "q": "Terraform infrastructure modules templates",
+  "expect": {
+   "must_include": [
+    "s042"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k07",
+  "q": "kubectl terminal CLI tools",
+  "expect": {
+   "must_include": [
+    "s046"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k08",
+  "q": "evaluating LLM agents guardrails",
+  "expect": {
+   "must_include": [
+    "s047"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k09",
+  "q": "backup restore disaster recovery drills",
+  "expect": {
+   "must_include": [
+    "s040"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k11",
+  "q": "edge computing fleet offline-first",
+  "expect": {
+   "must_include": [
+    "s009"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k12",
+  "q": "service mesh mTLS eBPF",
+  "expect": {
+   "must_include": [
+    "s007"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k13",
+  "q": "preview environments pull requests GitOps",
+  "expect": {
+   "must_include": [
+    "s015"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k14",
+  "q": "model serving inference rollouts MLOps",
+  "expect": {
+   "must_include": [
+    "s024"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k16",
+  "q": "runtime threat detection intrusion prevention",
+  "expect": {
+   "must_include": [
+    "s027"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k17",
+  "q": "vector search embeddings semantic retrieval",
+  "expect": {
+   "must_include": [
+    "s037"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "k18",
+  "q": "devcontainers onboarding production",
+  "expect": {
+   "must_include": [
+    "s004"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  }
+ },
+ {
+  "id": "i01",
+  "q": "I'm new to Kubernetes, where should I start?",
+  "expect": {
+   "must_include": [
+    "s046",
+    "s026"
+   ],
+   "must_not_include": [],
+   "min_results": 5
+  },
+  "note": "'new to' -> beginner"
+ },
+ {
+  "id": "i02",
+  "q": "I use a wheelchair, which talks are step-free?",
+  "expect": {
+   "must_include": [
+    "s039",
+    "s030"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'wheelchair' -> step_free_room"
+ },
+ {
+  "id": "i03",
+  "q": "do any talks have live captions for deaf attendees",
+  "expect": {
+   "must_include": [
+    "s011"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'captions'/'deaf' -> captions intent"
+ },
+ {
+  "id": "i04",
+  "q": "talks with captions for deaf attendees",
+  "expect": {
+   "must_include": [
+    "s039"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'captions' -> captions"
+ },
+ {
+  "id": "i05",
+  "q": "is there a quiet room nearby for sensory sensitivity?",
+  "expect": {
+   "must_include": [
+    "s039",
+    "s019"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'quiet'/'sensory' -> quiet_room_nearby"
+ },
+ {
+  "id": "i07",
+  "q": "sign language interpreter available?",
+  "expect": {
+   "must_include": [
+    "s039"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'sign language' -> sign_language"
+ },
+ {
+  "id": "i08",
+  "q": "advanced deep dive sessions for experts",
+  "expect": {
+   "must_include": [
+    "s003",
+    "s027",
+    "s043"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'advanced'/'deep dive' -> advanced"
+ },
+ {
+  "id": "i09",
+  "q": "beginner intro talks getting started",
+  "expect": {
+   "must_include": [
+    "s001",
+    "s034",
+    "s053"
+   ],
+   "must_not_include": [],
+   "min_results": 5
+  },
+  "note": "'beginner'/'intro' -> beginner"
+ },
+ {
+  "id": "i12",
+  "q": "I'm new to this, first time at a cloud conference",
+  "expect": {
+   "must_include": [
+    "s060",
+    "s019"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "'new to'/'first time' -> beginner"
+ },
+ {
+  "id": "s01",
+  "q": "how do I stop getting woken up at 3am by noisy alerts",
+  "expect": {
+   "must_include": [
+    "s021"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "alert fatigue paraphrase"
+ },
+ {
+  "id": "s02",
+  "q": "ways to keep secrets out of our cluster configs",
+  "expect": {
+   "must_include": [
+    "s003"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "workload identity"
+ },
+ {
+  "id": "s03",
+  "q": "recovering from mistakes without losing customer data",
+  "expect": {
+   "must_include": [
+    "s040",
+    "s028",
+    "s052"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "backup/DR"
+ },
+ {
+  "id": "s04",
+  "q": "making the cloud bill predictable before a big launch",
+  "expect": {
+   "must_include": [
+    "s059"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "cost forecasting"
+ },
+ {
+  "id": "s05",
+  "q": "running software on devices that lose internet often",
+  "expect": {
+   "must_include": [
+    "s048",
+    "s058"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "offline edge paraphrase"
+ },
+ {
+  "id": "s06",
+  "q": "how do platform teams treat internal developers like customers",
+  "expect": {
+   "must_include": [
+    "s034",
+    "s053"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "platform-as-product paraphrase"
+ },
+ {
+  "id": "s07",
+  "q": "keeping a volunteer community healthy long term",
+  "expect": {
+   "must_include": [
+    "s050",
+    "s060"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "community/governance"
+ },
+ {
+  "id": "s08",
+  "q": "understanding why our network requests mysteriously fail",
+  "expect": {
+   "must_include": [
+    "s014"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "DNS troubleshooting"
+ },
+ {
+  "id": "f01",
+  "q": "",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 0
+  },
+  "note": "empty query -> 0 results (server short-circuit)"
+ },
+ {
+  "id": "f02",
+  "q": "kubernetes",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 10
+  },
+  "note": "broad term"
+ },
+ {
+  "id": "f03",
+  "q": "finops",
+  "expect": {
+   "must_include": [
+    "s005",
+    "s018",
+    "s031",
+    "s045",
+    "s059"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "track keyword"
+ },
+ {
+  "id": "f04",
+  "q": "observability beginner",
+  "expect": {
+   "must_include": [
+    "s011",
+    "s041"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "level+topic"
+ },
+ {
+  "id": "f05",
+  "q": "advanced networking",
+  "expect": {
+   "must_include": [
+    "s007",
+    "s028",
+    "s051"
+   ],
+   "must_not_include": [],
+   "min_results": 3
+  },
+  "note": "level+topic"
+ },
+ {
+  "id": "f07",
+  "q": "security",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 5,
+   "track": "Security"
+  },
+  "note": "track filter + query"
+ },
+ {
+  "id": "f08",
+  "q": "kubernetes",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 1,
+   "track": "AI/ML on Kubernetes",
+   "level": "beginner"
+  },
+  "note": "track+level filters + query"
+ },
+ {
+  "id": "e01",
+  "q": "asdfghjkl qwerty zxcvbn",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 0
+  },
+  "note": "gibberish"
+ },
+ {
+  "id": "e02",
+  "q": "kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes kubernetes edge observability security",
+  "expect": {
+   "must_include": [],
+   "must_not_include": [],
+   "min_results": 0
+  },
+  "note": "very long query near 200-char limit"
+ },
+ {
+  "id": "e03",
+  "q": "cómo hacer que las charlas sean accesibles",
+  "expect": {
+   "must_include": [
+    "s039"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "Spanish"
+ },
+ {
+  "id": "e06",
+  "q": "cloud costs for product launches",
+  "expect": {
+   "must_include": [
+    "s059"
+   ],
+   "must_not_include": [],
+   "min_results": 1
+  },
+  "note": "paraphrase"
+ }
+]

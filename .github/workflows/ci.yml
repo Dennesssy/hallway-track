@@ -1,0 +1,92 @@
+# CI: build + test the Swift server, build the container image, run the
+# relevance eval gate against the in-memory backend, and scan for secrets.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  swift:
+    name: Swift build & test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.2"
+
+      - name: Build
+        working-directory: swift-server
+        run: swift build
+
+      - name: Test
+        working-directory: swift-server
+        run: swift test
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t hallway-track:ci -f swift-server/Dockerfile .
+
+  eval-gate:
+    name: Relevance eval (memory backend)
+    runs-on: ubuntu-latest
+    needs: swift
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.2"
+
+      - name: Build server
+        working-directory: swift-server
+        run: swift build
+
+      - name: Start server (memory backend — ELASTIC_URL unset)
+        working-directory: swift-server
+        run: |
+          unset ELASTIC_URL ELASTIC_API_KEY
+          PUBLIC_DIR=Public SESSIONS_JSON=../data/sessions.json PORT=8080 \
+            nohup .build/debug/hallway-track > /tmp/hallway.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/healthz > /dev/null 2>&1; then
+              echo "server ready"; exit 0
+            fi
+            sleep 1
+          done
+          echo "server failed to become ready"
+          cat /tmp/hallway.log
+          exit 1
+
+      - name: Run eval suite
+        env:
+          EVAL_URL: http://127.0.0.1:8080
+        run: |
+          if [ -f swift-server/eval/run.sh ]; then
+            bash swift-server/eval/run.sh
+          elif [ -f eval/runner.py ]; then
+            python3 eval/runner.py --write-report
+          else
+            echo "::notice::no eval runner found — skipping eval gate"
+          fi
+
+  gitleaks:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}

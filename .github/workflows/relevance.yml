@@ -1,0 +1,41 @@
+name: Relevance gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  relevance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+
+      - name: Build server
+        working-directory: swift-server
+        run: swift build
+
+      - name: Start server (memory backend)
+        working-directory: swift-server
+        run: |
+          PUBLIC_DIR=Public SESSIONS_JSON=../data/sessions.json PORT=8080 \
+            nohup .build/debug/hallway-track > /tmp/hallway.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/healthz > /dev/null 2>&1; then
+              echo "server ready"; exit 0
+            fi
+            sleep 1
+          done
+          echo "server failed to become ready"
+          cat /tmp/hallway.log
+          exit 1
+
+      - name: Run relevance suite (gate)
+        env:
+          EVAL_URL: http://127.0.0.1:8080
+        run: python3 eval/runner.py --write-report
