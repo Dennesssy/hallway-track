@@ -62,3 +62,6 @@ The server and first HTML page start from the team member's earlier project Perk
 
 ## License
 To be decided by the team before submission.
+
+## Live static demo
+A static, in-browser demo of the front end (sample data, keyword search only, no server) is published with GitHub Pages: https://dennesssy.github.io/hallway-track/ . The full app (Swift server, Elasticsearch hybrid and semantic search, Dash0, Kubernetes) is in this repository. See `pages/` for how the demo is assembled.
