@@ -61,7 +61,11 @@
   };
 
   function loadNeeds() {
-    try { return JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}"); } catch (e) { return {}; }
+    var n = {};
+    try { n = JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}") || {}; } catch (e) { n = {}; }
+    if (!Array.isArray(n.flags)) n.flags = [];   // first visit: nothing saved yet
+    if (n.level === undefined) n.level = null;
+    return n;
   }
   function saveNeeds(n) { try { localStorage.setItem(NEEDS_KEY, JSON.stringify(n)); } catch (e) {} }
   function collectNeeds() {
