@@ -10,6 +10,7 @@ WORKDIR /build
 COPY swift-server/Package.swift swift-server/Package.resolved ./
 RUN swift package resolve
 COPY swift-server/Sources ./Sources
+COPY swift-server/Tests ./Tests
 RUN swift build -c release --static-swift-stdlib -j 2
 RUN mkdir /stage \
     && cp "$(swift build -c release --show-bin-path)/hallway-track" /stage/ \
