@@ -61,7 +61,11 @@
   };
 
   function loadNeeds() {
-    try { return JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}"); } catch (e) { return {}; }
+    var n = {};
+    try { n = JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}") || {}; } catch (e) { n = {}; }
+    if (!Array.isArray(n.flags)) n.flags = [];   // first visit: nothing saved yet
+    if (n.level === undefined) n.level = null;
+    return n;
   }
   function saveNeeds(n) { try { localStorage.setItem(NEEDS_KEY, JSON.stringify(n)); } catch (e) {} }
   function collectNeeds() {
@@ -222,7 +226,7 @@
         }); }
         return r.json();
       })
-      .then(function (data) { renderResults(data); history.replaceState(null, "", "/?" + params(true).toString()); })
+      .then(function (data) { renderResults(data); history.replaceState(null, "", location.pathname + "?" + params(true).toString()); })
       .catch(function (e) { if (e.message === "503" || e.message === "bad") return; renderUnavailable(); })
       .then(function () { inFlight = false; if (loading) loading.hidden = true; });
   }
