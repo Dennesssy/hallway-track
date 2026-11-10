@@ -64,6 +64,28 @@ public enum Server {
                 "uptime_s": Int(Date().timeIntervalSince(ctx.startedAt))
             ])
         }
+        // Diagnostic: raw outbound HTTPS via the shared AHC client.
+        r.get("/api/nettest") { _ in
+            var out: [String: Any] = [:]
+            do {
+                var req = HTTPClientRequest(url: "https://example.com/")
+                let resp = try await ctx.httpClient.execute(req, timeout: .seconds(8))
+                out["example_com"] = Int(resp.status.code)
+            } catch {
+                out["example_com_error"] = "\(error)"
+            }
+            if let es = ctx.config.elasticURL, !es.isEmpty {
+                do {
+                    var req = HTTPClientRequest(url: "\(es)/_cluster/health")
+                    req.headers.add(name: "Authorization", value: "ApiKey \(ctx.config.elasticAPIKey ?? "")")
+                    let resp = try await ctx.httpClient.execute(req, timeout: .seconds(8))
+                    out["elastic_health"] = Int(resp.status.code)
+                } catch {
+                    out["elastic_error"] = "\(error)"
+                }
+            }
+            return Response.json(out)
+        }
         // Keynote Rush trigger (R22): fires a real burst of simulated traffic.
         r.post("/api/rush") { req in
             let attendees = Int(req.query["n"] ?? "170") ?? 170

@@ -1,0 +1,61 @@
+{
+  "voice": "Magpie-Multilingual.EN-US.Aria",
+  "slides": [
+    { "id": "01-title", "title": "Title", "sentences": [
+      "Hallway Track. Find the right talk, whoever you are.",
+      "Built at the Cloud Native Hackathon in Salt Lake City, by Dennis Stewart, team Denn."
+    ]},
+    { "id": "02-idea", "title": "The idea", "sentences": [
+      "Conferences are hard to navigate, and harder if you need captions, a step-free room, or a quiet seat.",
+      "Hallway Track lets you describe what you want to learn in your own words, then filters talks by what you need to take part.",
+      "Search by meaning, set your needs once, and plan your day."
+    ]},
+    { "id": "03-architecture", "title": "How it works", "sentences": [
+      "Here is how it works.",
+      "The browser loads a plain HTML page and calls a Swift server built on SwiftNIO.",
+      "The server asks Elasticsearch to find talks by keyword and by meaning, using Jina embeddings and a Jina reranker.",
+      "Every request sends traces and metrics to Dash0, and the whole app runs on Kubernetes, where Radar can watch it."
+    ]},
+    { "id": "04-hosting", "title": "Hosting and delivery", "sentences": [
+      "One container serves both the page and the API.",
+      "A Dockerfile builds it, Kubernetes runs it with health probes and an autoscaler, and Argo CD deploys each push.",
+      "Gitar reviews the pull requests, and a continuous integration job runs the relevance tests.",
+      "The manifests are written. Launching them on a cluster is the part still being verified."
+    ]},
+    { "id": "05-search", "title": "Smart search", "sentences": [
+      "Search is the heart of it.",
+      "Elasticsearch combines keyword matching with semantic search, then a Jina reranker puts the best talks first.",
+      "Each result says whether it matched your words, your meaning, or both.",
+      "Plain phrases like I use a wheelchair become visible filters, such as step-free access, that you can remove at any time."
+    ]},
+    { "id": "06-features", "title": "Features", "sentences": [
+      "On top of search, My agenda builds a time-zone-correct schedule and flags clashes, and it can suggest a swap.",
+      "Quiet route uses a live room-fill signal to suggest calmer, step-free, captioned rooms.",
+      "Access filters cover captions, sign language, step-free rooms, quiet rooms, and slides with alt text.",
+      "A health strip shows how fast each search was, with a trace ID you can copy."
+    ]},
+    { "id": "07-use", "title": "How to use it", "sentences": [
+      "To use it, type what you want to learn. Press slash to jump to the search box.",
+      "Pick your needs once, and they apply to every search.",
+      "Add talks to My agenda, then check the health strip to see how the app is doing."
+    ]},
+    { "id": "08-accessibility", "title": "Accessibility", "sentences": [
+      "Accessibility is built in, not added later.",
+      "Every control works from the keyboard with a visible focus ring, and results are announced to screen readers.",
+      "State never relies on colour alone, and the page respects reduced motion and forced colours.",
+      "There is a dyslexia-friendly font option and a fallback that works without JavaScript.",
+      "Manual checks in Safari and with VoiceOver are the last step."
+    ]},
+    { "id": "09-rush", "title": "Keynote Rush", "sentences": [
+      "The demo story is Keynote Rush.",
+      "A load test simulates a hundred and seventy attendees opening their agenda at once, right after the keynote.",
+      "Dash0 shows the slowdown, and Agent0 points to the cause.",
+      "Radar watches the cluster respond, and a Gitar-reviewed pull request ships the fix."
+    ]},
+    { "id": "10-status", "title": "Status and close", "sentences": [
+      "What is built: the Swift server, the page, My agenda, room fill, the relevance tests, and the deploy files.",
+      "Still being verified: the cluster launch, the Elasticsearch relevance numbers, and browser monitoring in Dash0.",
+      "Thank you. This is Hallway Track, by Dennis Stewart, team Denn."
+    ]}
+  ]
+}
