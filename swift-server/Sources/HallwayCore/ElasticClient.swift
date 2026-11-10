@@ -181,10 +181,7 @@ public final class ElasticClient: @unchecked Sendable {
         var timings = BackendTimings()
         let t0 = DispatchTime.now().uptimeNanoseconds
 
-        // Empty query -> sorted listing, no ES call.
-        if f.q.trimmingCharacters(in: .whitespaces).isEmpty && !f.quietRoute {
-            return ([], timings)
-        }
+        let isListing = f.q.trimmingCharacters(in: .whitespaces).isEmpty
 
         if config.faultESUnreachable {
             throw ElasticError.unreachable
@@ -217,6 +214,11 @@ public final class ElasticClient: @unchecked Sendable {
             let inSem = semHits[id] != nil
             let match: MatchKind? = f.q.isEmpty ? nil : (inKw && inSem ? .both : (inKw ? .keyword : .semantic))
             hits.append(SearchHit(session: s, match: match, score: score, highlights: [:]))
+        }
+
+        // Empty query is a plain listing in schedule order (fusion scores carry no meaning without a query).
+        if isListing {
+            hits.sort { ($0.session.day, $0.session.start, $0.session.id) < ($1.session.day, $1.session.start, $1.session.id) }
         }
 
         // Apply deterministic filters (track/level/day/flags) — server-side
