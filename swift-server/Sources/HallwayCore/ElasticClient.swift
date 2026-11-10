@@ -364,9 +364,9 @@ public final class ElasticClient: @unchecked Sendable {
         guard let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
               let arr = (json["hits"] as? [String: Any])?["hits"] as? [[String: Any]] else { return hits }
         for h in arr {
-            if let id = (h["_source"] as? [String: Any])?["id"] as? String,
-               let score = h["_score"] as? Double {
-                hits[id] = score
+            if let id = (h["_source"] as? [String: Any])?["id"] as? String {
+                // _score is null when the query sorts (the empty-query schedule listing); keep those hits.
+                hits[id] = (h["_score"] as? Double) ?? 0
             }
         }
         return hits
