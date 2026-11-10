@@ -31,14 +31,11 @@ struct HallwayMain {
             fatalError("sessions.json missing or invalid")
         }
 
-        // HTTP client for ES calls — dedicated ELG (the singleton is shared with
-        // swift-otel's OTLP exporter and proved fragile under load).
-        let httpELG = MultiThreadedEventLoopGroup(numberOfThreads: 2)
-        let httpClient = HTTPClient(eventLoopGroupProvider: .shared(httpELG))
-        defer {
-            try? httpClient.syncShutdown()
-            try? httpELG.syncShutdownGracefully()
-        }
+        // HTTP client for ES calls — posix singleton ELG.
+        // (MultiThreadedEventLoopGroup in this process broke outbound connects
+        //  with EBADF on macOS 27; the selectable singleton works.)
+        let httpClient = HTTPClient(eventLoopGroupProvider: .shared(NIOSingletons.posixEventLoopGroup))
+        defer { try? httpClient.syncShutdown() }
 
         let roomFill = RoomFillStore()
         let agendaStore = AgendaStore()
@@ -49,8 +46,10 @@ struct HallwayMain {
 
         let router = Server.makeRouter(context: ctx)
 
-        // NIO bootstrap
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: max(1, ProcessInfo.processInfo.processorCount))
+        // NIO bootstrap — share the singleton ELG with the HTTP client.
+        // (Two independent MultiThreadedEventLoopGroups in one process broke
+        //  outbound connects with EBADF on this machine; singleton works.)
+        let group = MultiThreadedEventLoopGroup.singleton
         defer { try? group.syncShutdownGracefully() }
 
         let bootstrap = ServerBootstrap(group: group)

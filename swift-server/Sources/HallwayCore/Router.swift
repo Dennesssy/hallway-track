@@ -84,6 +84,14 @@ public enum Server {
                     out["elastic_error"] = "\(error)"
                 }
             }
+            // URLSession probe: bypasses NIO entirely (Network.framework path).
+            do {
+                let (data, resp) = try await URLSession.shared.data(from: URL(string: "https://example.com/")!)
+                out["urlsession_example"] = (resp as? HTTPURLResponse)?.statusCode ?? -1
+                _ = data
+            } catch {
+                out["urlsession_error"] = "\(error)"
+            }
             return Response.json(out)
         }
         // Keynote Rush trigger (R22): fires a real burst of simulated traffic.

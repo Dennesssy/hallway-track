@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.1
 import PackageDescription
 
 let package = Package(
@@ -16,7 +16,7 @@ let package = Package(
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.36.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-metrics.git", from: "2.8.0"),
-        .package(url: "https://github.com/swift-otel/swift-otel.git", from: "1.0.0"),
+        .package(url: "https://github.com/swift-otel/swift-otel.git", from: "1.0.0", traits: ["OTLPHTTP"]),
         .package(url: "https://github.com/apple/swift-distributed-tracing.git", from: "1.0.0"),
         .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.0.0")
     ],
@@ -73,4 +73,6 @@ let package = Package(
             path: "Tests"
         )
     ]
+    ,
+    swiftLanguageModes: [.v5]
 )

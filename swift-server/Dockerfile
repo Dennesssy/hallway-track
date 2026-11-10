@@ -10,11 +10,10 @@ WORKDIR /build
 COPY swift-server/Package.swift swift-server/Package.resolved ./
 RUN swift package resolve
 COPY swift-server/Sources ./Sources
-RUN swift build -c release -j 2
+RUN swift build -c release --static-swift-stdlib -j 2
 RUN mkdir /stage \
     && cp "$(swift build -c release --show-bin-path)/hallway-track" /stage/ \
     && cp "$(swift build -c release --show-bin-path)/hallway-index" /stage/
-
 FROM debian:bookworm-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libjemalloc2 ca-certificates tzdata curl \
