@@ -4,18 +4,18 @@
     {
       "id": "01-title",
       "title": "Title",
-      "seconds": 9.766,
+      "seconds": 9.466,
       "parts": [
         {
           "text": "Hallway Track. Find the right talk, whoever you are.",
           "audio": "audio/01-title-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 3.297
         },
         {
           "text": "Built at the Cloud Native Hackathon in Salt Lake City, by Dennis Stewart, team Denn.",
           "audio": "audio/01-title-2.wav",
-          "start": 4.197,
+          "start": 3.997,
           "duration": 4.969
         }
       ]
@@ -23,117 +23,99 @@
     {
       "id": "02-idea",
       "title": "The idea",
-      "seconds": 18.518,
+      "seconds": 14.11,
       "parts": [
         {
           "text": "Conferences are hard to navigate, and harder if you need captions, a step-free room, or a quiet seat.",
           "audio": "audio/02-idea-1.wav",
-          "start": 0.6,
-          "duration": 5.898
+          "start": 0.5,
+          "duration": 6.316
         },
         {
           "text": "Hallway Track lets you describe what you want to learn in your own words, then filters talks by what you need to take part.",
           "audio": "audio/02-idea-2.wav",
-          "start": 6.798,
-          "duration": 6.687
-        },
-        {
-          "text": "Search by meaning, set your needs once, and plan your day.",
-          "audio": "audio/02-idea-3.wav",
-          "start": 13.785,
-          "duration": 4.133
+          "start": 7.016,
+          "duration": 6.594
         }
       ]
     },
     {
       "id": "03-architecture",
       "title": "How it works",
-      "seconds": 23.369,
+      "seconds": 20.765,
       "parts": [
         {
-          "text": "Here is how it works.",
-          "audio": "audio/03-architecture-1.wav",
-          "start": 0.6,
-          "duration": 1.207
-        },
-        {
           "text": "The browser loads a plain HTML page and calls a Swift server built on SwiftNIO.",
-          "audio": "audio/03-architecture-2.wav",
-          "start": 2.107,
-          "duration": 5.851
+          "audio": "audio/03-architecture-1.wav",
+          "start": 0.5,
+          "duration": 5.573
         },
         {
           "text": "The server asks Elasticsearch to find talks by keyword and by meaning, using Jina embeddings and a Jina reranker.",
-          "audio": "audio/03-architecture-3.wav",
-          "start": 8.259,
+          "audio": "audio/03-architecture-2.wav",
+          "start": 6.273,
           "duration": 7.198
         },
         {
           "text": "Every request sends traces and metrics to Dash0, and the whole app runs on Kubernetes, where Radar can watch it.",
-          "audio": "audio/03-architecture-4.wav",
-          "start": 15.757,
-          "duration": 7.012
+          "audio": "audio/03-architecture-3.wav",
+          "start": 13.671,
+          "duration": 6.594
         }
       ]
     },
     {
       "id": "04-hosting",
       "title": "Hosting and delivery",
-      "seconds": 23.091,
+      "seconds": 16.447,
       "parts": [
         {
           "text": "One container serves both the page and the API.",
           "audio": "audio/04-hosting-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 2.972
         },
         {
           "text": "A Dockerfile builds it, Kubernetes runs it with health probes and an autoscaler, and Argo CD deploys each push.",
           "audio": "audio/04-hosting-2.wav",
-          "start": 3.872,
-          "duration": 7.523
-        },
-        {
-          "text": "Gitar reviews the pull requests, and a continuous integration job runs the relevance tests.",
-          "audio": "audio/04-hosting-3.wav",
-          "start": 11.695,
-          "duration": 5.341
+          "start": 3.672,
+          "duration": 7.338
         },
         {
           "text": "The manifests are written. Launching them on a cluster is the part still being verified.",
-          "audio": "audio/04-hosting-4.wav",
-          "start": 17.336,
-          "duration": 5.155
+          "audio": "audio/04-hosting-3.wav",
+          "start": 11.21,
+          "duration": 4.737
         }
       ]
     },
     {
       "id": "05-search",
       "title": "Smart search",
-      "seconds": 21.094,
+      "seconds": 20.594,
       "parts": [
         {
           "text": "Search is the heart of it.",
           "audio": "audio/05-search-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 1.393
         },
         {
           "text": "Elasticsearch combines keyword matching with semantic search, then a Jina reranker puts the best talks first.",
           "audio": "audio/05-search-2.wav",
-          "start": 2.293,
+          "start": 2.093,
           "duration": 6.409
         },
         {
           "text": "Each result says whether it matched your words, your meaning, or both.",
           "audio": "audio/05-search-3.wav",
-          "start": 9.002,
+          "start": 8.702,
           "duration": 4.133
         },
         {
           "text": "Plain phrases like I use a wheelchair become visible filters, such as step-free access, that you can remove at any time.",
           "audio": "audio/05-search-4.wav",
-          "start": 13.435,
+          "start": 13.035,
           "duration": 7.059
         }
       ]
@@ -141,55 +123,49 @@
     {
       "id": "06-features",
       "title": "Features",
-      "seconds": 26.76,
+      "seconds": 21.741,
       "parts": [
         {
           "text": "On top of search, My agenda builds a time-zone-correct schedule and flags clashes, and it can suggest a swap.",
           "audio": "audio/06-features-1.wav",
-          "start": 0.6,
-          "duration": 6.269
+          "start": 0.5,
+          "duration": 6.641
         },
         {
           "text": "Quiet route uses a live room-fill signal to suggest calmer, step-free, captioned rooms.",
           "audio": "audio/06-features-2.wav",
-          "start": 7.169,
-          "duration": 6.13
+          "start": 7.341,
+          "duration": 5.851
         },
         {
           "text": "Access filters cover captions, sign language, step-free rooms, quiet rooms, and slides with alt text.",
           "audio": "audio/06-features-3.wav",
-          "start": 13.599,
-          "duration": 8.034
-        },
-        {
-          "text": "A health strip shows how fast each search was, with a trace ID you can copy.",
-          "audio": "audio/06-features-4.wav",
-          "start": 21.934,
-          "duration": 4.226
+          "start": 13.392,
+          "duration": 7.848
         }
       ]
     },
     {
       "id": "07-use",
       "title": "How to use it",
-      "seconds": 13.967,
+      "seconds": 13.567,
       "parts": [
         {
           "text": "To use it, type what you want to learn. Press slash to jump to the search box.",
           "audio": "audio/07-use-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 5.016
         },
         {
           "text": "Pick your needs once, and they apply to every search.",
           "audio": "audio/07-use-2.wav",
-          "start": 5.916,
+          "start": 5.716,
           "duration": 2.74
         },
         {
           "text": "Add talks to My agenda, then check the health strip to see how the app is doing.",
           "audio": "audio/07-use-3.wav",
-          "start": 8.955,
+          "start": 8.655,
           "duration": 4.412
         }
       ]
@@ -197,36 +173,36 @@
     {
       "id": "08-accessibility",
       "title": "Accessibility",
-      "seconds": 24.32,
+      "seconds": 23.72,
       "parts": [
         {
           "text": "Accessibility is built in, not added later.",
           "audio": "audio/08-accessibility-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 2.926
         },
         {
           "text": "Every control works from the keyboard with a visible focus ring, and results are announced to screen readers.",
           "audio": "audio/08-accessibility-2.wav",
-          "start": 3.826,
+          "start": 3.626,
           "duration": 5.619
         },
         {
           "text": "State never relies on colour alone, and the page respects reduced motion and forced colours.",
           "audio": "audio/08-accessibility-3.wav",
-          "start": 9.745,
+          "start": 9.445,
           "duration": 5.387
         },
         {
           "text": "There is a dyslexia-friendly font option and a fallback that works without JavaScript.",
           "audio": "audio/08-accessibility-4.wav",
-          "start": 15.432,
+          "start": 15.032,
           "duration": 4.412
         },
         {
           "text": "Manual checks in Safari and with VoiceOver are the last step.",
           "audio": "audio/08-accessibility-5.wav",
-          "start": 20.144,
+          "start": 19.644,
           "duration": 3.576
         }
       ]
@@ -234,30 +210,30 @@
     {
       "id": "09-rush",
       "title": "Keynote Rush",
-      "seconds": 19.608,
+      "seconds": 19.108,
       "parts": [
         {
           "text": "The demo story is Keynote Rush.",
           "audio": "audio/09-rush-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 1.95
         },
         {
           "text": "A load test simulates a hundred and seventy attendees opening their agenda at once, right after the keynote.",
           "audio": "audio/09-rush-2.wav",
-          "start": 2.85,
+          "start": 2.65,
           "duration": 6.409
         },
         {
           "text": "Dash0 shows the slowdown, and Agent0 points to the cause.",
           "audio": "audio/09-rush-3.wav",
-          "start": 9.559,
+          "start": 9.259,
           "duration": 4.226
         },
         {
           "text": "Radar watches the cluster respond, and a Gitar-reviewed pull request ships the fix.",
           "audio": "audio/09-rush-4.wav",
-          "start": 14.085,
+          "start": 13.685,
           "duration": 4.923
         }
       ]
@@ -265,28 +241,28 @@
     {
       "id": "10-status",
       "title": "Status and close",
-      "seconds": 22.234,
+      "seconds": 21.834,
       "parts": [
         {
           "text": "What is built: the Swift server, the page, My agenda, room fill, the relevance tests, and the deploy files.",
           "audio": "audio/10-status-1.wav",
-          "start": 0.6,
+          "start": 0.5,
           "duration": 8.22
         },
         {
           "text": "Still being verified: the cluster launch, the Elasticsearch relevance numbers, and browser monitoring in Dash0.",
           "audio": "audio/10-status-2.wav",
-          "start": 9.12,
+          "start": 8.92,
           "duration": 7.895
         },
         {
           "text": "Thank you. This is Hallway Track, by Dennis Stewart, team Denn.",
           "audio": "audio/10-status-3.wav",
-          "start": 17.315,
+          "start": 17.015,
           "duration": 4.319
         }
       ]
     }
   ],
-  "totalSeconds": 202.73
+  "totalSeconds": 181.35
 }

@@ -8,8 +8,8 @@ if (!KEY) { console.error("NVIDIA_API_KEY is not set"); process.exit(1); }
 const FUNCTION_ID = "877104f7-e885-42b9-8de8-f6e4c6303969"; // magpie-tts-multilingual (build.nvidia.com)
 const URL = `https://${FUNCTION_ID}.invocation.api.nvcf.nvidia.com/v1/audio/synthesize`;
 const RATE = 44100;
-const GAP = 0.3;       // seconds of silence between sentences
-const EDGE = 0.6;      // seconds of lead-in and lead-out per slide
+const GAP = 0.2;       // seconds of silence between sentences
+const EDGE = 0.5;      // seconds of lead-in and lead-out per slide
 const FORCE = process.argv.includes("--force");
 
 const script = JSON.parse(readFileSync("narration.json", "utf8"));
