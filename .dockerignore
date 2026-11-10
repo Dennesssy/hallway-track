@@ -1,0 +1,9 @@
+# Build context for: docker build -f swift-server/Dockerfile .
+# Allowlist: nothing else (no .env, no .git, no build output, no docs) ever enters the image.
+*
+!swift-server/Package.swift
+!swift-server/Package.resolved
+!swift-server/Sources
+!swift-server/Tests
+!swift-server/Public
+!data/sessions.json

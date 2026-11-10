@@ -4,7 +4,7 @@ Find the right conference talk, whoever you are. Built at the **Cloud Native Hac
 
 Hallway Track searches conference sessions with natural language or keywords and filters them by what attendees need to take part: captions, sign language, step-free rooms, quiet rooms nearby and slides with alt text.
 
-> **Status: in progress (build started today).** Setup and run steps will land in `BUILD.md` as each part is verified.
+> **Status (submission snapshot):** the Swift/NIO server, static front end (search, filters, My agenda, health strip), relevance suite and Gitar configuration are built and committed. Built and run locally. Kubernetes manifests, Argo CD and Dash0 assets are written but **not yet verified on a cluster**; the Elasticsearch relevance numbers have **not** been run (the report covers the in-memory fallback only). See `.agents/STATE.md` for the full list.
 
 ## How it fits the tracks
 | Track | What Hallway Track does |
