@@ -1,0 +1,22 @@
+# Argo CD Application — watches this repo and syncs deploy/k8s into the
+# hallway-track namespace. Adjust repoURL to your git remote.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hallway-track
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/denn/Hackathon-Slc.git
+    targetRevision: main
+    path: deploy/k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hallway-track
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

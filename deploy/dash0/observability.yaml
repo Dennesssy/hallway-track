@@ -1,0 +1,105 @@
+# Dash0 observability config-as-code for Hallway Track (R11).
+# Dash0 CLI: `dash0 apply -f deploy/dash0/ --dry-run` then `dash0 apply -f deploy/dash0/`.
+# NOTE: the Dash0 CLI asset kinds have evolved; verify with `dash0 schema` /
+# Dash0 docs. Canonical kinds today include CheckRule, SyntheticCheck, View,
+# and Dashboard (beta). SLOs may require Terraform/operator — flagged inline.
+
+# --- Synthetic check: search page availability + latency ---------------------
+apiVersion: dash0.com/v1alpha1
+kind: SyntheticCheck
+metadata:
+  name: hallway-search-synthetic
+spec:
+  description: "GET / and /api/search?q=rust every 60s"
+  frequency: 60
+  timeoutSeconds: 10
+  request:
+    method: GET
+    url: "https://hallway-track.example.com/api/search?q=rust&limit=5"
+  assertions:
+    - type: status_code
+      equals: 200
+    - type: duration_ms
+      lessThan: 2000
+
+# --- CheckRule: p95 search latency SLO alert --------------------------------
+apiVersion: dash0.com/v1alpha1
+kind: CheckRule
+metadata:
+  name: hallway-search-p95-latency
+spec:
+  description: "Alert when p95 latency of /api/search exceeds 1.5s for 5m"
+  dataset: default
+  check:
+    type: metric_threshold
+    query: |
+      sum by (service_name) (
+        histogram_quantile(0.95,
+          sum by (le, service_name) (rate(http_server_request_duration_seconds_bucket{service_name="hallway-track",route="/api/search"}[5m]))
+        )
+      )
+    operator: greater_than
+    threshold: 1.5
+    for: 5m
+  severity: warning
+  notificationChannels: [] # fill in Slack/PagerDuty channel IDs
+
+# --- CheckRule: error rate ----------------------------------------------------
+apiVersion: dash0.com/v1alpha1
+kind: CheckRule
+metadata:
+  name: hallway-search-error-rate
+spec:
+  description: "Alert when 5xx ratio on hallway-track exceeds 5% for 5m"
+  dataset: default
+  check:
+    type: metric_threshold
+    query: |
+      sum(rate(http_server_request_duration_seconds_count{service_name="hallway-track",status_class="5xx"}[5m]))
+      /
+      sum(rate(http_server_request_duration_seconds_count{service_name="hallway-track"}[5m]))
+    operator: greater_than
+    threshold: 0.05
+    for: 5m
+  severity: critical
+  notificationChannels: []
+
+# --- View: service overview ---------------------------------------------------
+apiVersion: dash0.com/v1alpha1
+kind: View
+metadata:
+  name: hallway-track-overview
+spec:
+  title: "Hallway Track — Service Overview"
+  dataset: default
+  panels:
+    - title: "Request rate"
+      type: timeseries
+      query: sum by (route) (rate(http_server_request_duration_seconds_count{service_name="hallway-track"}[5m]))
+    - title: "p95 latency by route"
+      type: timeseries
+      query: |
+        histogram_quantile(0.95,
+          sum by (le, route) (rate(http_server_request_duration_seconds_bucket{service_name="hallway-track"}[5m])))
+    - title: "Errors (5xx)"
+      type: timeseries
+      query: sum(rate(http_server_request_duration_seconds_count{service_name="hallway-track",status_class="5xx"}[5m]))
+    - title: "Backend spans (keyword / semantic / rerank)"
+      type: table
+      query: |
+        sum by (span_name) (rate(traces_span_metrics_calls_total{service_name="hallway-track"}[5m]))
+
+# --- SLO ----------------------------------------------------------------------
+# Dash0 SLOs-as-code: the CLI does not yet expose a first-class SLO asset;
+# define it in Dash0 UI (Settings → SLOs) or via Terraform provider
+# (dash0_slo). Keep the definition here as the source of truth:
+#
+# apiVersion: dash0.com/v1alpha1
+# kind: SLO
+# metadata:
+#   name: hallway-search-latency-slo
+# spec:
+#   service: hallway-track
+#   sli: p95(http.server.request.duration{route="/api/search"})
+#   objective: 95% of requests under 1000ms over 30d
+#   errorBudget: 5%

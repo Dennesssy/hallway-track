@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hallway-track
+  namespace: hallway-track
+  labels:
+    app: hallway-track
+spec:
+  type: ClusterIP
+  selector:
+    app: hallway-track
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

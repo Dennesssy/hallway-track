@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: hallway-track
+  namespace: hallway-track
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: hallway-track

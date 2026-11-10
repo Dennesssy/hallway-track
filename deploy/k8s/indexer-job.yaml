@@ -1,0 +1,38 @@
+# One-shot Job that (re)creates the Elasticsearch `sessions` index and bulk
+# indexes data/sessions.json (baked into the image at /app/data/sessions.json).
+# Re-run with `kubectl -n hallway-track delete job hallway-index && kubectl apply -f deploy/k8s/indexer-job.yaml`
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hallway-index
+  namespace: hallway-track
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: hallway-index
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: hallway-index
+          image: ghcr.io/hallway/hallway-track:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/app/hallway-index", "--recreate"]
+          env:
+            - name: SESSIONS_JSON
+              value: /app/data/sessions.json
+          envFrom:
+            - configMapRef:
+                name: hallway-track-config
+            - secretRef:
+                name: hallway-track-secret
+                optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
