@@ -18,12 +18,12 @@ if judges need access (`gh repo edit Dennesssy/hallway-track --visibility public
 | S3 | Front end (static HTML+JS, vendored htmx) | done | search/filters/agenda/ops strip, noscript SSR via HTMLView.inject |
 | S4/S5 | A11y + UI evidence | done | docs/ACCESSIBILITY.md, tests/ui/CHECKLIST.md |
 | S6 | Relevance suite + CI gate | done | eval/{queries.json,run.sh,baseline.json,REPORT.md}, .github/workflows/relevance.yml |
-| S7 | OTel → Dash0 | done (verify export) | Telemetry.swift bootstrap; spans on http.* + hallway.search; .env quoting fixed |
-| S8 | Container + k8s + ArgoCD | written, cluster-verify pending | deploy/{k8s,argocd,dash0}, swift-server/Dockerfile |
+| S7 | OTel → Dash0 | code done; export unverified (macOS outbound bug) | Telemetry.swift; OTLPHTTP-only trait fix committed; verify in container |
+| S8 | Container + k8s + ArgoCD | manifests applied to OrbStack; image build in progress | deploy/{k8s,argocd,dash0}, swift-server/Dockerfile; pods ImagePullBackOff until image exists |
 | S9 | Faults + runbooks | done | FAULT_*/CHAOS env, ?demo=1, /api/rush, docs/runbooks/* |
 | S10 | CI + Gitar | done | .github/workflows/ci.yml, .gitar/{rules,review,instructions,config} |
-| S11 | Keynote Rush evidence | partial | /api/rush works (170 simulated attendees); docs/demo evidence thin |
-| S12 | Docs | partial | BUILD.md, README, EXPLAIN.md (human answers still empty by design) |
+| S11 | Keynote Rush evidence | done (memory backend) | docs/demo/rush-before-after.md real measurements; usage-log.md; pr-log.md rewritten to match actual PRs |
+| S12 | Docs | done except EXPLAIN.md (human) | BUILD.md (+macOS signing note), README, ACCESSIBILITY.md, runbooks, pr-log.md real |
 | S13 | WebGPU experiment | not started | lowest priority per plan |
 
 ## Branches (all pushed)
