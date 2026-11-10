@@ -103,20 +103,6 @@ public final class SearchService: @unchecked Sendable {
                 }
             }
         }
-        // When the person states an access need, talks that meet more of the access features come first
-        // (stable: ties keep the relevance order).
-        if !intent.flags.isEmpty {
-            func accessCount(_ h: SearchHit) -> Int {
-                let a = h.session.accessibility
-                return [a.captions, a.signLanguage, a.stepFreeRoom, a.quietRoomNearby, a.slidesAltText].filter { $0 }.count
-            }
-            results = results.enumerated()
-                .sorted { l, r in
-                    let (cl, cr) = (accessCount(l.element), accessCount(r.element))
-                    return cl != cr ? cl > cr : l.offset < r.offset
-                }
-                .map { $0.element }
-        }
         timings.totalMs = Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000
 
         return SearchResponse(
