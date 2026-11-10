@@ -22,3 +22,6 @@ pepper
 
 # generated relevance run output
 eval/results-*.json
+
+# PWA icons are real assets
+!swift-server/Public/icons/*.png

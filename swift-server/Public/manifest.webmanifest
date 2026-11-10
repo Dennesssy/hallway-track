@@ -1,0 +1,23 @@
+{
+  "name": "Hallway Track",
+  "short_name": "Hallway",
+  "description": "Find the right conference talk, whoever you are. Search by meaning, filter by what you need, plan your day.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0056b3",
+  "lang": "en",
+  "categories": ["productivity", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Search talks", "url": "./#q", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

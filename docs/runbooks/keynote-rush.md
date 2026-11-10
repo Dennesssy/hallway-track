@@ -9,7 +9,7 @@ real endpoint/flag that exists in `swift-server/Sources` — nothing is invented
 - Open `/?demo=1` (or `/#demo`). `app.js isDemo()` then:
   - unhides `#demo-controls` → checkbox **"Simulate a slow search (demo)"**
     (`input[name=slow]` → `slow=true` on every `/api/search` call);
-  - appends a **"Keynote Rush (simulated load)"** button that POSTs `/api/rush?n=170`.
+  - appends a **"Keynote Rush (simulated load)"** button that POSTs `/api/rush?n=170`. `n` is clamped to 1…500 (default 170); out-of-range values are clamped, not rejected.
 - The link in the filters panel (`<a href="/?demo=1#top">Keynote Rush</a>`) does the same.
 - `DEMO=0` env disables demo mode server-side (`Config.demoEnabled`).
 
@@ -20,7 +20,7 @@ real endpoint/flag that exists in `swift-server/Sources` — nothing is invented
 | Slow-search checkbox | `?slow=true` on `/api/search`, `/ui/results` | Server sleeps `DEMO_SLOW_MS` (env `DEMO_SLOW_MS`, default 1500, clamp 0–5000) **before** the real search. Response carries `"demo_slow": true`; the "How this was found" dialog shows "Slow demo: on". |
 | Global latency injection | env `FAULT_LATENCY_MS=<0..30000>` + `CHAOS=1` or `FAULTS=1` | `SearchService.search` sleeps that many ms on **every** request — sustained slowness for the rush story. |
 | ES outage injection | env `FAULT_ES_DOWN=1` + `CHAOS=1`/`FAULTS=1` | `ElasticClient.ping()` returns false and `search` throws `ElasticError.unreachable` → per-request memory fallback with `fallback_reason: elastic_unavailable` (see es-outage.md). |
-| Keynote Rush | `POST /api/rush?n=<count>&room=<room>` | Spawns a `Task` that loops n times: `roomFill.checkIn` + a real `SearchService.search` with rotating queries (`tracing, kubernetes, platform, observability, security, finops, edge, ai`). Default n=170 ≈ venue capacity. Returns immediately (`{"ok":true,"attendees":170}`); load continues in background. |
+| Keynote Rush | `POST /api/rush?n=<count>&room=<room>` | Spawns a `Task` that loops n times: `roomFill.checkIn` + a real `SearchService.search` with rotating queries (`tracing, kubernetes, platform, observability, security, finops, edge, ai`). Default n=170 ≈ venue capacity; `n` is clamped to 1…500 (negative or huge values never reach the loop). Returns immediately (`{"ok":true,"attendees":170}`); load continues in background. |
 | Room-fill signal | `POST /api/rooms/checkin?room=<r>&n=<k>`, `POST /api/rooms/reset`, `GET /api/rooms` | Simulated occupancy per room, labelled "simulated" in the UI; feeds Quiet-route ranking and `/api/search` `room_fill_pct`. |
 
 ## Suggested demo sequence

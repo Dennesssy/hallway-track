@@ -11,6 +11,7 @@
   --accent: #0056b3;
   --accent-fill: #007bff;
   --mark: #fde68a;
+  --on-mark: #1b1f24;   /* ink on the yellow mark colour; stays dark in both themes (about 10:1) */
   --error: #b91c1c;
   --border: #dee2e6;
   --input-border: #6b7280;
@@ -94,7 +95,7 @@ body {
 .needs-chips { display: flex; gap: .35rem; flex-wrap: wrap; }
 .need-chip {
   display: inline-flex; align-items: center; gap: .3rem;
-  background: var(--mark); color: var(--text);
+  background: var(--mark); color: var(--on-mark);
   border-radius: 999px; padding: .2rem .6rem; font-size: .8rem;
 }
 .need-chip button { border: 0; background: none; cursor: pointer; color: inherit; font-size: .9rem; padding: 0 .1rem; }
@@ -158,7 +159,7 @@ select, input[type="search"], input[type="text"] {
 .match-chip.both { background: var(--accent-fill); color: #fff; border: 2px solid var(--accent); }
 .card-meta { color: var(--muted); font-size: .85rem; margin: .3rem 0; }
 .card-abstract { margin: .4rem 0; font-size: .9rem; }
-.card-abstract mark, .highlight mark { background: var(--mark); color: var(--text); padding: 0 .1rem; border-radius: 2px; }
+.card-abstract mark, .highlight mark { background: var(--mark); color: var(--on-mark); padding: 0 .1rem; border-radius: 2px; }
 .access-row { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
 .access-item { font-size: .75rem; padding: .15rem .45rem; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); }
 .access-item.yes { border-color: var(--slo-ok); }
@@ -187,7 +188,7 @@ select, input[type="search"], input[type="text"] {
 .ops-spark { margin: .75rem 0; display: grid; gap: .2rem; }
 .ops-trace { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; margin: .5rem 0; }
 .ops-trace code { font-size: .75rem; background: var(--bg); padding: .15rem .4rem; border-radius: 4px; }
-.sim-badge { font-size: .65rem; background: var(--mark); color: var(--text); padding: .1rem .4rem; border-radius: 4px; vertical-align: middle; }
+.sim-badge { font-size: .65rem; background: var(--mark); color: var(--on-mark); padding: .1rem .4rem; border-radius: 4px; vertical-align: middle; }
 .room-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .35rem; }
 .room-list li { display: flex; justify-content: space-between; font-size: .8rem; }
 .room-fill-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; margin-top: .15rem; }
@@ -240,7 +241,7 @@ html[data-font="dyslexia"] body {
 }
 
 /* 200% text zoom safety: no fixed heights that clip */
-@media (min-width: 721px) {
+@media (min-width: 1025px) {
   .layout { grid-template-columns: 240px minmax(0,1fr) 280px; }
 }
 
@@ -258,3 +259,8 @@ html[data-font="dyslexia"] body {
 .agenda-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .agenda-list li { display: flex; gap: .5rem; align-items: baseline; font-size: .9rem; }
 .agenda-list .btn { flex: none; }
+
+/* PWA: offline notice (literal colours so it reads the same in light, dark and forced-colors) */
+.offline-note { padding: .5rem 1rem; text-align: center; font-size: .9rem; background: #fff4d6; color: #3a2a00; border-bottom: 2px solid #c58a00; }
+.offline-note[hidden] { display: none; }
+@media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top, 0); } }

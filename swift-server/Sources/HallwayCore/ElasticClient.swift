@@ -175,16 +175,29 @@ public final class ElasticClient: @unchecked Sendable {
 
     // MARK: - Search
 
+    /// Domain jargon whose meaning the embedding model and BM25 both miss
+    /// (the abstracts say "cloud spend" / "cost", never the acronym).
+    static let jargon: [String: String] = [
+        "finops": "cloud spend cost optimization",
+    ]
+
+    static func expandJargon(_ q: String) -> String {
+        var out = q
+        for w in q.lowercased().split(whereSeparator: { !$0.isLetter && !$0.isNumber }) {
+            if let extra = jargon[String(w)] { out += " " + extra }
+        }
+        return out
+    }
+
     /// Hybrid search: BM25 + semantic_text, RRF fusion, optional rerank.
     /// Returns hits in final order plus per-stage timings.
-    public func search(_ f: SearchFilters) async throws -> (hits: [SearchHit], timings: BackendTimings) {
+    public func search(_ original: SearchFilters) async throws -> (hits: [SearchHit], timings: BackendTimings) {
+        var f = original
+        f.q = Self.expandJargon(original.q)
         var timings = BackendTimings()
         let t0 = DispatchTime.now().uptimeNanoseconds
 
-        // Empty query -> sorted listing, no ES call.
-        if f.q.trimmingCharacters(in: .whitespaces).isEmpty && !f.quietRoute {
-            return ([], timings)
-        }
+        let isListing = f.q.trimmingCharacters(in: .whitespaces).isEmpty
 
         if config.faultESUnreachable {
             throw ElasticError.unreachable
@@ -217,6 +230,11 @@ public final class ElasticClient: @unchecked Sendable {
             let inSem = semHits[id] != nil
             let match: MatchKind? = f.q.isEmpty ? nil : (inKw && inSem ? .both : (inKw ? .keyword : .semantic))
             hits.append(SearchHit(session: s, match: match, score: score, highlights: [:]))
+        }
+
+        // Empty query is a plain listing in schedule order (fusion scores carry no meaning without a query).
+        if isListing {
+            hits.sort { ($0.session.day, $0.session.start, $0.session.id) < ($1.session.day, $1.session.start, $1.session.id) }
         }
 
         // Apply deterministic filters (track/level/day/flags) — server-side
@@ -362,9 +380,9 @@ public final class ElasticClient: @unchecked Sendable {
         guard let json = try? JSONSerialization.jsonObject(with: bbToData(buf)) as? [String: Any],
               let arr = (json["hits"] as? [String: Any])?["hits"] as? [[String: Any]] else { return hits }
         for h in arr {
-            if let id = (h["_source"] as? [String: Any])?["id"] as? String,
-               let score = h["_score"] as? Double {
-                hits[id] = score
+            if let id = (h["_source"] as? [String: Any])?["id"] as? String {
+                // _score is null when the query sorts (the empty-query schedule listing); keep those hits.
+                hits[id] = (h["_score"] as? Double) ?? 0
             }
         }
         return hits

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Hallway Track">
+  <rect width="512" height="512" fill="#0056b3"/>
+  <g transform="translate(76 76) scale(.703)">
+    <path d="M136 132h240a40 40 0 0 1 40 40v128a40 40 0 0 1-40 40H262l-72 64v-64h-54a40 40 0 0 1-40-40V172a40 40 0 0 1 40-40z" fill="#ffffff"/>
+    <rect x="152" y="188" width="208" height="22" rx="11" fill="#0056b3"/>
+    <rect x="152" y="238" width="160" height="22" rx="11" fill="#0056b3" opacity=".75"/>
+    <rect x="152" y="288" width="184" height="22" rx="11" fill="#0056b3" opacity=".5"/>
+  </g>
+</svg>
