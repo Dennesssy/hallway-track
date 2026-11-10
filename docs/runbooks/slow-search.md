@@ -8,7 +8,7 @@ This is the R13/R22 demo scenario. Two ways to make search slow:
 |---|---|---|
 | `?slow=true` / `?slow=1` on `/api/search` and `/ui/results` | `Router.parseSearchFilters` → `SearchFilters.slow` | Sleeps `DEMO_SLOW_MS` (env, default **1500 ms**, clamped 0–5000) before searching. `DEMO=0` disables demo mode entirely (`Config.demoEnabled`; the UI hides the checkbox under `?demo=1`). |
 | `FAULT_LATENCY_MS=<n>` env (0–30000) | `SearchService.search` | Sleeps n ms on **every** search — use for the Keynote Rush / sustained-latency story. Requires `CHAOS=1` or `FAULTS=1`. |
-| `POST /api/rush?n=170&room=Great Salt Hall` | `Router` | Fires a real burst: n simulated attendees each do a room check-in + a real `/api/search`. This is real traffic, not a sleep — use it to drive HPA/Radar. |
+| `POST /api/rush?n=170&room=Great Salt Hall` | `Router` | Fires a real burst (`n` clamped to 1…500, default 170): n simulated attendees each do a room check-in + a real `/api/search`. This is real traffic, not a sleep — use it to drive HPA/Radar. |
 | `POST /api/rooms/checkin?room=<r>&n=<count>` | `Router` | Bumps simulated room occupancy (R17). |
 
 There is **no** rerank-timeout env var; timeouts are hard-coded in `ElasticClient`:

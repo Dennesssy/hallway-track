@@ -96,7 +96,7 @@ public enum Server {
         }
         // Keynote Rush trigger (R22): fires a real burst of simulated traffic.
         r.post("/api/rush") { req in
-            let attendees = Int(req.query["n"] ?? "170") ?? 170
+            let attendees = max(1, min(500, Int(req.query["n"] ?? "170") ?? 170))
             let room = req.query["room"] ?? "Great Salt Hall"
             Task {
                 // Simulate attendees opening agenda + searching.

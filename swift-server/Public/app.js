@@ -61,7 +61,11 @@
   };
 
   function loadNeeds() {
-    try { return JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}"); } catch (e) { return {}; }
+    var n = {};
+    try { n = JSON.parse(localStorage.getItem(NEEDS_KEY) || "{}") || {}; } catch (e) { n = {}; }
+    if (!Array.isArray(n.flags)) n.flags = [];   // first visit: nothing saved yet
+    if (n.level === undefined) n.level = null;
+    return n;
   }
   function saveNeeds(n) { try { localStorage.setItem(NEEDS_KEY, JSON.stringify(n)); } catch (e) {} }
   function collectNeeds() {
@@ -193,6 +197,9 @@
     } else {
       host.innerHTML = list.map(cardHTML).join("");
     }
+    state.list = list;
+    var rd = $("#reader");
+    if (rd) rd.innerHTML = '<p class="reader-empty">Select a talk to read the details here.</p>';
     updateOps(data);
   }
 
@@ -383,11 +390,15 @@
       var openDlg = $("dialog[open]");
       if (openDlg && typeof openDlg.close === "function") openDlg.close();
     }
-    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && document.activeElement === $("#results")) {
+    if (e.key === "Enter" && document.activeElement && document.activeElement.classList && document.activeElement.classList.contains("card")) showReader(document.activeElement.getAttribute("data-card-id"));
+    var ae = document.activeElement, resultsEl = $("#results");
+    // Arrow keys work from the results region and from any card inside it, not only on first focus.
+    var inResults = !!ae && !!resultsEl && (ae === resultsEl || (ae.classList && ae.classList.contains("card") && resultsEl.contains(ae)));
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && inResults) {
       var cards = $$("#results .card");
       if (!cards.length) return;
       e.preventDefault();
-      var idx = cards.indexOf(document.activeElement);
+      var idx = cards.indexOf(ae);
       var next = e.key === "ArrowDown" ? Math.min(idx + 1, cards.length - 1) : Math.max(idx - 1, 0);
       cards[next].focus();
     }
@@ -421,9 +432,32 @@
     });
   }
 
+  function showReader(id) {
+    var h = (state.list || []).filter(function (x) { return String(x.id) === String(id); })[0];
+    var rd = $("#reader");
+    if (!h || !rd) return;
+    $$("#results .card").forEach(function (c) { c.classList.toggle("selected", c.getAttribute("data-card-id") === String(id)); });
+    rd.innerHTML = "<h2>" + esc(h.title) + "</h2>" +
+      '<p class="reader-meta">' + esc(h.speaker) + " · " + esc(h.track) + " · " + esc(h.level) + "</p>" +
+      '<p class="reader-meta">Day ' + esc(h.day) + " · " + esc(h.start) + " · " + esc(h.room) + " · " + esc(h.duration_min) + " min</p>" +
+      '<p class="reader-abstract">' + esc(h.abstract) + "</p>" +
+      '<div class="access-row" aria-label="Access info">' + accessibilityLines(h.accessibility || {}) + "</div>" +
+      '<div class="reader-actions"><button type="button" class="btn" data-agenda-add="' + esc(h.id) + '">+ My agenda</button><span class="add-status" role="status"></span></div>';
+  }
+
   document.addEventListener("click", function (e) {
     var t = e.target;
     if (!t || !t.closest) return;
+    var addBtn = t.closest("[data-agenda-add]");
+    if (addBtn) {
+      var st = addBtn.parentNode.querySelector(".add-status");
+      fetch("/api/agenda/add?device=" + encodeURIComponent(deviceId()) + "&id=" + encodeURIComponent(addBtn.getAttribute("data-agenda-add")), { method: "POST" })
+        .then(function (r) { if (st) st.textContent = r.ok ? "Added to your agenda." : "Couldn't add (it may clash or already be there)."; })
+        .catch(function () { if (st) st.textContent = "Couldn't reach the server."; });
+      return;
+    }
+    var cardEl = t.closest("#results .card");
+    if (cardEl) { showReader(cardEl.getAttribute("data-card-id")); return; }
     if (t.closest("#results .empty-state .btn")) { clearFilters.click(); return; }
     if (t.closest("#retry-search")) { runSearch(true); return; }
     var closeBtn = t.closest("[data-dialog-close]");
@@ -570,4 +604,53 @@
   var dashScript = document.querySelector('script[src*="dash0-web"]');
   if (dashScript) dashScript.addEventListener("load", initDash0);
   else initDash0();
+
+  // ---------- PWA: service worker + offline notice ----------
+  // Service workers need a secure context: https, or localhost during development.
+  if ("serviceWorker" in navigator) {
+    var secureOrigin = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (secureOrigin) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function () { /* the app works without it */ });
+      });
+    }
+  }
+  function setOfflineNote(offline) {
+    var note = $("#offline-note");
+    if (!note) {
+      note = document.createElement("div");
+      note.id = "offline-note";
+      note.className = "offline-note";
+      note.setAttribute("role", "status");
+      note.hidden = true;
+      document.body.insertBefore(note, document.body.firstChild);
+    }
+    note.textContent = offline ? "You're offline. Showing the last results we loaded." : "";
+    note.hidden = !offline;
+  }
+  window.addEventListener("offline", function () { setOfflineNote(true); });
+  window.addEventListener("online", function () { setOfflineNote(false); runSearch(true); });
+  if (navigator.onLine === false) setOfflineNote(true);
+})();
+
+/* Decorative canvas: soft drifting colour blobs behind the glass windows. Off for reduced motion and hidden tabs. */
+(function () {
+  var c = document.getElementById("bg");
+  if (!c || !c.getContext) return;
+  var mq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (mq && mq.matches) return;
+  var ctx = c.getContext("2d"), w = 0, h = 0, t = 0, raf = 0;
+  var blobs = [[.2,.25,"rgba(10,132,255,.16)",.35],[.8,.3,"rgba(191,90,242,.13)",.3],[.6,.85,"rgba(48,209,88,.12)",.32]];
+  function size() { w = c.width = innerWidth; h = c.height = innerHeight; }
+  function frame() {
+    t += .0035; ctx.clearRect(0, 0, w, h);
+    blobs.forEach(function (b, i) {
+      var x = (b[0] + Math.sin(t + i * 2) * .08) * w, y = (b[1] + Math.cos(t * .8 + i) * .08) * h, r = b[3] * Math.max(w, h);
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, b[2]); g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    });
+    raf = requestAnimationFrame(frame);
+  }
+  size(); addEventListener("resize", size); frame();
+  document.addEventListener("visibilitychange", function () { cancelAnimationFrame(raf); if (!document.hidden) frame(); });
 })();
