@@ -61,7 +61,9 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
             }
         case .end:
             if bodyTooLarge {
-                writeResponse(.errorJSON(code: "payload_too_large", message: "Request body too large", status: .payloadTooLarge), context: context)
+                var tooLarge = Response.errorJSON(code: "payload_too_large", message: "Request body too large", status: .payloadTooLarge)
+                applySecurityHeaders(&tooLarge)
+                writeResponse(tooLarge, context: context)
                 return
             }
             let req = makeRequest()
