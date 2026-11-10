@@ -69,12 +69,12 @@ jobs:
 
       - name: Run eval suite
         env:
-          EVAL_URL: http://127.0.0.1:8080
+          BASE_URL: http://127.0.0.1:8080
         run: |
-          if [ -f swift-server/eval/run.sh ]; then
-            bash swift-server/eval/run.sh
+          if [ -f eval/run.sh ]; then
+            bash eval/run.sh http://127.0.0.1:8080
           elif [ -f eval/runner.py ]; then
-            python3 eval/runner.py --write-report
+            EVAL_URL=http://127.0.0.1:8080 python3 eval/runner.py --write-report
           else
             echo "::notice::no eval runner found — skipping eval gate"
           fi

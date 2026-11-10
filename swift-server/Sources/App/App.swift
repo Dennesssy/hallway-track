@@ -31,9 +31,14 @@ struct HallwayMain {
             fatalError("sessions.json missing or invalid")
         }
 
-        // HTTP client for ES calls
-        let httpClient = HTTPClient(eventLoopGroupProvider: .shared(MultiThreadedEventLoopGroup.singleton))
-        defer { try? httpClient.syncShutdown() }
+        // HTTP client for ES calls — dedicated ELG (the singleton is shared with
+        // swift-otel's OTLP exporter and proved fragile under load).
+        let httpELG = MultiThreadedEventLoopGroup(numberOfThreads: 2)
+        let httpClient = HTTPClient(eventLoopGroupProvider: .shared(httpELG))
+        defer {
+            try? httpClient.syncShutdown()
+            try? httpELG.syncShutdownGracefully()
+        }
 
         let roomFill = RoomFillStore()
         let agendaStore = AgendaStore()

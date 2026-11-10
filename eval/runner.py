@@ -24,12 +24,11 @@ REPORT = os.path.join(HERE, "REPORT.md")
 LIMIT = 20
 K = 10
 
-# Gate baseline: the in-memory backend is a labelled stand-in; keep a modest
-# floor so ranking regressions are caught without demanding ES quality.
-GATE_NDCG = 0.40
-GATE_MRR = 0.30
-
-
+# Gate baseline: committed against the in-memory fallback (what CI runs without
+# ES credentials). Deliberately close to the measured baseline so real ranking
+# regressions fail; loosening these hides quality loss. Override with env.
+GATE_NDCG = float(os.environ.get("GATE_NDCG", "0.86"))
+GATE_MRR = float(os.environ.get("GATE_MRR", "0.88"))
 def fetch_search(base, query):
     qs = urllib.parse.urlencode({"q": query, "limit": LIMIT})
     url = base.rstrip("/") + "/api/search?" + qs
@@ -59,6 +58,16 @@ def mrr(ranked, relevant):
     return 0.0
 
 
+def parse_query(x):
+    """Accept both {id,query,relevant} and the concurrent {id,q,expect.must_include}
+    query schema so the suite is schema-agnostic."""
+    q = x.get("query") or x.get("q", "")
+    rel = x.get("relevant")
+    if rel is None:
+        expect = x.get("expect") or {}
+        rel = expect.get("must_include", [])
+    return q, set(rel)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-report", action="store_true")
@@ -72,16 +81,17 @@ def main():
     rows = []
     mrrs, ndcgs, backends = [], [], set()
     for q in queries:
-        data = fetch_search(base, q["query"])
+        query_text, relevant = parse_query(q)
+        data = fetch_search(base, query_text)
         backend = data.get("backend", "?")
-        backends.add(backend)
+        if data.get("fallback_reason"):
+            backend += " (fallback: %s)" % data["fallback_reason"]
         ranked = [h["id"] for h in data.get("results", [])]
-        relevant = set(q.get("relevant", []))
         m = mrr(ranked, relevant)
         n = ndcg(ranked, relevant)
         mrrs.append(m)
         ndcgs.append(n)
-        rows.append((q["id"], q["query"], m, n, backend))
+        rows.append((q["id"], query_text, m, n, backend))
 
     mean = lambda xs: sum(xs) / len(xs) if xs else 0.0
     agg_mrr = mean(mrrs)

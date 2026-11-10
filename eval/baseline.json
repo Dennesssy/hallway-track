@@ -1,0 +1,27 @@
+{
+  "comment": "Per-backend relevance baselines. Entries are NEVER mixed: the runner only gates against the backend reported by /api/search responses. Values measured 2026-11-10 against 60 sessions / 44 queries (small sample: shows direction, not statistical proof). min_* set ~0.05 below measured to allow ranking jitter.",
+  "backends": {
+    "elastic": {
+      "min_mrr": 0.80,
+      "min_hit_at_10": 0.92,
+      "measured": {
+        "mrr": 0.8694,
+        "hit_at_10": 0.973,
+        "ndcg_at_10": 0.8833,
+        "queries": 44,
+        "results_file": "results-20261110T001724Z.json"
+      }
+    },
+    "memory": {
+      "min_mrr": 0.68,
+      "min_hit_at_10": 0.85,
+      "measured": {
+        "mrr": 0.7315,
+        "hit_at_10": 0.8947,
+        "ndcg_at_10": 0.7462,
+        "queries": 44,
+        "results_file": "results-20261110T001838Z.json"
+      }
+    }
+  }
+}

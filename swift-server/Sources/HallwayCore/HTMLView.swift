@@ -176,8 +176,15 @@ enum HTMLView {
         var out = html
         // Replace the empty #results div content, the count region pieces,
         // and the track select options.
-        out = out.replacingOccurrences(of: "<!-- server-rendered fragment lands here -->",
-                                       with: cards)
+        if out.contains("<!-- server-rendered fragment lands here -->") {
+            out = out.replacingOccurrences(of: "<!-- server-rendered fragment lands here -->",
+                                           with: cards)
+        } else {
+            // No marker: fill the empty #results container directly.
+            out = out.replacingOccurrences(
+                of: "<div id=\"results\" class=\"results\" tabindex=\"-1\"></div>",
+                with: "<div id=\"results\" class=\"results\" tabindex=\"-1\">\(cards)</div>")
+        }
         // Inject count/interpretation/fallback into #count-region after h2
         out = out.replacingOccurrences(
             of: "<p id=\"result-count\" class=\"result-count\"></p>",
