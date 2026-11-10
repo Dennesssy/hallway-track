@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hallway Track — Find the right talk</title>
+<meta name="description" content="Conference session search with accessibility filters, hybrid Elasticsearch, and a live agenda.">
+<link rel="stylesheet" href="./app.css">
+<script src="./demo-shim.js"></script><script src="./app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#results">Skip to results</a>
+<noscript><p class="fallback-note">Hallway Track needs JavaScript to search. Please enable JavaScript to use the site.</p></noscript>
+
+<header class="site-header" id="top">
+  <div class="header-inner">
+    <div class="brand">
+      <h1>Hallway Track</h1>
+      <p class="tagline">Find the right talk, whoever you are.</p>
+    </div>
+    <div class="search-row" role="search">
+      <form id="search-form" class="search-form" action="./" method="get" novalidate>
+        <label class="visually-hidden" for="q">Search talks</label>
+        <input id="q" name="q" type="search" autocomplete="off"
+               placeholder='Describe what you want to learn, e.g. "intro to tracing"'
+               aria-describedby="search-hint">
+        <button type="submit" class="btn">Search</button>
+      </form>
+      <p id="search-hint" class="visually-hidden">Press / to jump here. Press Esc to clear.</p>
+      <div id="needs" class="needs-row" aria-label="My needs">
+        <span class="needs-label">My needs</span>
+        <div id="needs-chips" class="needs-chips" role="group" aria-label="Applied needs"></div>
+        <details class="needs-editor">
+          <summary>+ add</summary>
+          <fieldset>
+            <legend>My needs</legend>
+            <p class="helper">Pick what you need once. We apply it to every search.</p>
+            <label><input type="checkbox" name="needs-captions" data-flag="captions"> Live captions</label>
+            <label><input type="checkbox" name="needs-sign" data-flag="sign_language"> Sign language interpreter</label>
+            <label><input type="checkbox" name="needs-step" data-flag="step_free_room"> Step-free room</label>
+            <label><input type="checkbox" name="needs-quiet" data-flag="quiet_room_nearby"> Quiet room nearby</label>
+            <label><input type="checkbox" name="needs-alt" data-flag="slides_alt_text"> Slides with alt text</label>
+            <label class="level-pick"><span>Level</span>
+              <select id="needs-level">
+                <option value="">Any level</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </label>
+            <button type="button" id="needs-clear" class="btn ghost">Clear my needs</button>
+          </fieldset>
+        </details>
+        <p class="needs-note">Saved on this device only.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="filters-col" aria-label="Filters">
+    <details class="panel" id="filters-panel" open>
+      <summary>Filters <span id="filter-count" class="count-badge"></span></summary>
+      <form id="filters" class="filters" novalidate>
+        <div class="filter-group">
+          <label for="f-track">Track</label>
+          <select id="f-track" name="track">
+            <option value="">All tracks</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-level">Level</label>
+          <select id="f-level" name="level">
+            <option value="">Any level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label" id="day-label">Day</span>
+          <div class="day-pills" role="group" aria-labelledby="day-label">
+            <label><input type="radio" name="day" value=""> Any</label>
+            <label><input type="radio" name="day" value="1"> Day 1</label>
+            <label><input type="radio" name="day" value="2"> Day 2</label>
+            <label><input type="radio" name="day" value="3"> Day 3</label>
+          </div>
+        </div>
+        <fieldset class="access-group">
+          <legend>Access info</legend>
+          <p class="helper">Show only talks that offer all you select.</p>
+          <label><input type="checkbox" name="flags" value="captions"> Live captions</label>
+          <label><input type="checkbox" name="flags" value="sign_language"> Sign language interpreter</label>
+          <label><input type="checkbox" name="flags" value="step_free_room"> Step-free room</label>
+          <label><input type="checkbox" name="flags" value="quiet_room_nearby"> Quiet room nearby</label>
+          <label><input type="checkbox" name="flags" value="slides_alt_text"> Slides with alt text</label>
+        </fieldset>
+        <div class="filter-group quiet-toggle">
+          <label><input type="checkbox" name="quiet" value="true"> Quiet route (calm rooms first)</label>
+        </div>
+        <div class="filter-actions">
+          <button type="button" id="clear-filters" class="btn ghost">Clear filters</button>
+          <button type="button" id="open-agenda" class="btn ghost">My agenda</button>
+          <a class="btn ghost" href="./?demo=1#top">Keynote Rush</a>
+        </div>
+        <div id="demo-controls" class="demo-controls" hidden>
+          <label><input type="checkbox" name="slow" value="true"> Simulate a slow search (demo)</label>
+        </div>
+      </form>
+    </details>
+  </aside>
+
+  <section class="results-col" aria-labelledby="results-heading">
+    <div id="loading" class="loading-indicator" aria-live="polite" hidden>
+      <p>Searching talks…</p>
+      <div class="skeleton" aria-hidden="true"></div>
+      <div class="skeleton" aria-hidden="true"></div>
+      <div class="skeleton" aria-hidden="true"></div>
+    </div>
+
+    <div id="count-region" aria-live="polite" class="count-region">
+      <h2 id="results-heading">Talks</h2>
+      <p id="result-count" class="result-count"></p>
+      <p id="interpreted" class="interpreted"></p>
+      <p id="fallback-note" class="fallback-note" hidden></p>
+    </div>
+
+    <div id="results" class="results" tabindex="-1"></div>
+  </section>
+
+  <aside class="ops-col" aria-label="Search health">
+    <section class="ops-panel" aria-labelledby="ops-heading">
+      <h2 id="ops-heading">Search health</h2>
+      <div class="ops-grid">
+        <div class="metric">
+          <span class="metric-label">Latency</span>
+          <span class="metric-value" id="op-latency">–</span>
+          <span class="metric-sub">last search</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">SLO</span>
+          <span class="metric-value"><span id="op-slo-dot" class="slo-dot" aria-hidden="true"></span><span id="op-slo-text">–</span></span>
+          <span class="metric-sub" id="op-slo-sub"></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Backend</span>
+          <span class="metric-value" id="op-backend">–</span>
+          <span class="metric-sub" id="op-semantic"></span>
+        </div>
+      </div>
+      <div class="ops-spark">
+        <span class="metric-label">Last 20 searches</span>
+        <svg id="sparkline" viewBox="0 0 120 28" role="img" aria-label="Latency sparkline" width="120" height="28"></svg>
+        <span class="visually-hidden" id="sparkline-text"></span>
+      </div>
+      <div class="ops-trace">
+        <span class="metric-label">Trace ID</span>
+        <code id="op-trace">–</code>
+        <button type="button" id="copy-trace" class="btn tiny">Copy trace ID</button>
+        <span id="copy-status" class="visually-hidden" aria-live="polite"></span>
+      </div>
+      <button type="button" id="show-query" class="btn ghost">Show how this was found</button>
+      <dialog id="query-dialog" class="dialog"></dialog>
+    </section>
+    <section class="ops-panel rooms" aria-labelledby="rooms-heading">
+      <h2 id="rooms-heading">Room fill <span class="sim-badge">simulated</span></h2>
+      <ul id="room-list" class="room-list"></ul>
+      <p class="helper">Simulated check-ins for the demo. Not real attendance.</p>
+    </section>
+  </aside>
+</main>
+
+<dialog id="agenda-dialog" class="dialog"></dialog>
+
+<footer class="site-footer">
+  <p id="footer-meta">Loading build info…</p>
+  <p class="footer-note">Hallway Track · Cloud Native Hackathon 2026 · AI-assisted build, disclosed in README.</p>
+</footer>
+
+</body>
+</html>
