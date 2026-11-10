@@ -31,13 +31,20 @@ main (= s7-s9-deploy tip ce26277) · s1-nio-core · s3-ui · s4-accessibility ·
 s6-eval · s7-s9-deploy · chore/gitar-config
 
 ## Known issues (post-submission fix list)
-1. **ES connect bug**: long-running server process gets `EBADF`/connect-timeout
-   on ALL outbound AHC HTTPS (Elastic Cloud AND Dash0 OTLP) while curl, the
-   indexer and swift tests connect fine. Search falls back to labelled memory
-   backend (~10s penalty). Repro: run hallway-track, GET /api/search.
-   Suspect: NIOPosix event-loop state in server process; dedicated ELG did NOT
-   fix it. Next: try NIOTS/URLSession backend for AHC, or bisect by removing
-   the NIO server bootstrap.
+1. **ES connect bug — PARTIALLY FIXED**: two root causes found.
+   (a) FIXED: swift-otel's default OTLPGRPC trait pulled grpc-swift +
+       swift-nio-transport-services, which poisoned ALL outbound connects in
+       server binaries. Package.swift now uses traits: ["OTLPHTTP"] only.
+       hallway-index verified working (pushed 60 docs to ES in ~1s).
+   (b) macOS 27 blocks outbound networking for ADHOC-signed binaries —
+       SwiftPM products must be re-signed with a Developer ID cert after
+       every build (see BUILD.md). xctest/curl unaffected.
+   (c) STILL OPEN: hallway-track server binary on macOS still fails outbound
+       (AHC EBADF + URLSession -1005) even signed, no-grpc, OTel-disabled,
+       minimal probe (Config.load+HTTPClient only). Minimal NIO+AHC repro
+       with same deps WORKS — suspect is something in the full binary link.
+       Unverified whether Linux container is affected — docker image build
+       in progress; k8s pods will prove it.
 2. `.env` OTEL_EXPORTER_OTLP_HEADERS needed quotes (space in "Bearer …") —
    fixed locally; k8s Secret must carry the full value.
 3. Repo visibility: still private.

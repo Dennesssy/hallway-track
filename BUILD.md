@@ -7,6 +7,19 @@
   server falls back to a labelled in-memory backend
 - Optional: Dash0 OTLP endpoint for traces/metrics/logs
 
+
+## macOS note (local dev binaries)
+SwiftPM produces **adhoc-signed** binaries, and macOS 27 blocks outbound
+networking for adhoc-signed executables (connect → EBADF / "network connection
+lost", including URLSession). After every `swift build`, sign the products:
+```sh
+codesign --force --sign 21BEA8F1DA72225986D23266B0F7A9A435AAB501 \
+  .build/out/Products/Debug/hallway-track \
+  .build/out/Products/Debug/hallway-index
+```
+(Any valid Developer ID signature works; adhoc `-` does not.) Linux containers
+are unaffected — this only bites local macOS runs.
+
 ## Configure
 ```sh
 cp .env.example .env   # fill in real values; .env is gitignored
@@ -45,7 +58,9 @@ Useful endpoints: `/healthz`, `/readyz` (backend + doc count), `/api/search`,
 
 ## Test
 ```sh
-cd swift-server && swift test
+cd swift-server
+set -a; source ../.env; set +a   # enables live ES integration tests
+swift test
 ```
 19 unit tests always run; `ElasticIntegrationTests` run live when
 `ELASTIC_URL`/`ELASTIC_API_KEY` are set and print SKIPPED otherwise.
