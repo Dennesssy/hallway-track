@@ -17,7 +17,7 @@ if judges need access (`gh repo edit Dennesssy/hallway-track --visibility public
 | S2 | ES hybrid search + memory fallback | done | BM25+semantic_text RRF+Jina rerank; eval elastic MRR 0.869 |
 | S3 | Front end (static HTML+JS, vendored htmx) | done | search/filters/agenda/ops strip, noscript SSR via HTMLView.inject |
 | S4/S5 | A11y + UI evidence | done | docs/ACCESSIBILITY.md, tests/ui/CHECKLIST.md |
-| S6 | Relevance suite + CI gate | done | eval/{queries.json,run.sh,baseline.json,REPORT.md}, .github/workflows/relevance.yml |
+| S6 | Relevance suite + CI gate | done — verified in-cluster | eval/{queries.json,run.sh,baseline.json,REPORT.md}; run vs k8s svc: hit@10 37/38, MRR 0.8678, nDCG 0.8827, gate passed |
 | S7 | OTel → Dash0 | code done; export unverified (macOS outbound bug) | Telemetry.swift; OTLPHTTP-only trait fix committed; verify in container |
 | S8 | Container + k8s + ArgoCD | DONE — verified in OrbStack | pods Ready 2/2, backend=elastic live search, indexer job 60 docs, all endpoints 200; image ghcr.io/hallway/hallway-track:latest (local build) |
 | S9 | Faults + runbooks | done | FAULT_*/CHAOS env, ?demo=1, /api/rush, docs/runbooks/* |
