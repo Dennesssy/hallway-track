@@ -102,7 +102,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     private func dispatch(_ req: Request) async throws -> Response {
         guard let route = router.match(method: req.method, path: req.path) else {
             // Static fallback for unknown paths under /vendor/ or assets
-            if req.method == "GET" && (req.path.hasPrefix("/vendor/") || req.path.hasSuffix(".css") || req.path.hasSuffix(".js") || req.path.hasSuffix(".png") || req.path.hasSuffix(".svg") || req.path.hasSuffix(".ico")) {
+            if req.method == "GET" && (req.path.hasPrefix("/vendor/") || req.path.hasPrefix("/icons/") || req.path.hasSuffix(".webmanifest") || req.path.hasSuffix(".css") || req.path.hasSuffix(".js") || req.path.hasSuffix(".png") || req.path.hasSuffix(".svg") || req.path.hasSuffix(".ico")) {
                 return try await serveStatic(req.path)
             }
             return .notFound()
@@ -160,6 +160,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         case "css": mime = "text/css; charset=utf-8"
         case "js", "mjs": mime = "text/javascript; charset=utf-8"
         case "json": mime = "application/json"
+        case "webmanifest": mime = "application/manifest+json"
         case "svg": mime = "image/svg+xml"
         case "png": mime = "image/png"
         case "jpg", "jpeg": mime = "image/jpeg"
@@ -170,7 +171,9 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         }
         var buf = ByteBuffer()
         buf.writeBytes(data)
-        return Response(status: .ok, headers: ["Content-Type": mime, "Cache-Control": "public, max-age=300"], body: buf)
+        // The service worker must revalidate on every load, or a fixed version can never reach users.
+        let cacheControl = clean == "sw.js" ? "no-cache" : "public, max-age=300"
+        return Response(status: .ok, headers: ["Content-Type": mime, "Cache-Control": cacheControl], body: buf)
     }
 
     private func writeResponse(_ resp: Response, context: ChannelHandlerContext) {
