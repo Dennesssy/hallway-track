@@ -10,7 +10,7 @@
  */
 "use strict";
 
-var VERSION = "ht-pwa-v1";
+var VERSION = "ht-pwa-v2";
 var SHELL = ["./", "./app.css", "./app.js", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon.svg"];
 var API_CACHEABLE = /\/api\/(search|facets|meta|rooms)$/;
 var MAX_API_ENTRIES = 40;

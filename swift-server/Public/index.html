@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hallway Track — Find the right talk</title>
 <meta name="description" content="Conference session search with accessibility filters, hybrid Elasticsearch, and a live agenda.">
-<meta name="theme-color" content="#0056b3">
+<meta name="theme-color" content="#eef2f8">
 <meta name="application-name" content="Hallway Track">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,15 +18,16 @@
 <script src="/app.js" defer></script>
 </head>
 <body>
+<canvas id="bg" aria-hidden="true"></canvas>
 <a class="skip-link" href="#results">Skip to results</a>
 <noscript><p class="fallback-note">Hallway Track needs JavaScript to search. Please enable JavaScript to use the site.</p></noscript>
 
+<div class="stage">
+<div class="window main-window">
 <header class="site-header" id="top">
+  <div class="titlebar"><span class="lights" aria-hidden="true"><i class="l r"></i><i class="l y"></i><i class="l g"></i></span>
+    <div class="brand"><h1>Hallway Track</h1><span class="tagline">Find the right talk, whoever you are.</span></div></div>
   <div class="header-inner">
-    <div class="brand">
-      <h1>Hallway Track</h1>
-      <p class="tagline">Find the right talk, whoever you are.</p>
-    </div>
     <div class="search-row" role="search">
       <form id="search-form" class="search-form" action="/" method="get" novalidate>
         <label class="visually-hidden" for="q">Search talks</label>
@@ -137,7 +138,13 @@
     <div id="results" class="results" tabindex="-1"></div>
   </section>
 
-  <aside class="ops-col" aria-label="Search health">
+  <article class="reader" id="reader" aria-label="Talk details" aria-live="polite">
+    <p class="reader-empty">Select a talk to read the details here.</p>
+  </article>
+</main>
+</div>
+
+<aside class="ops-col" aria-label="Search health">
     <section class="ops-panel" aria-labelledby="ops-heading">
       <h2 id="ops-heading">Search health</h2>
       <div class="ops-grid">
@@ -176,8 +183,8 @@
       <ul id="room-list" class="room-list"></ul>
       <p class="helper">Simulated check-ins for the demo. Not real attendance.</p>
     </section>
-  </aside>
-</main>
+</aside>
+</div>
 
 <dialog id="agenda-dialog" class="dialog"></dialog>
 
