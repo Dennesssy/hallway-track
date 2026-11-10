@@ -43,8 +43,11 @@ public enum IntentParser {
     public static let rules: [(pattern: [String], flags: Set<String>, level: String?, note: String)] = [
         (["wheelchair", "step-free", "step free", "accessible", "mobility"],
          ["step_free_room"], nil, "Step-free room"),
-        (["captions", "captioned", "subtitle", "subtitles", "deaf", "hard of hearing"],
+        (["captions", "captioned", "subtitle", "subtitles"],
          ["captions"], nil, "Live captions"),
+        // Deaf and hard-of-hearing attendees need both: captions for the talk and an interpreter for Q&A.
+        (["deaf", "hard of hearing"],
+         ["captions", "sign_language"], nil, "Live captions and sign language interpreter"),
         (["sign language", "sign-language", "asl", "bsl"],
          ["sign_language"], nil, "Sign language interpreter"),
         (["quiet", "calm", "sensory", "anxiety", "low noise"],
