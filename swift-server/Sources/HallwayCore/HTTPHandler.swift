@@ -77,7 +77,9 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
                     }
                 } catch {
                     el.execute {
-                        self.writeResponse(.errorJSON(code: "internal", message: "Internal error", status: .internalServerError), context: context)
+                        var failed = Response.errorJSON(code: "internal", message: "Internal error", status: .internalServerError)
+                        self.applySecurityHeaders(&failed)
+                        self.writeResponse(failed, context: context)
                     }
                 }
             }
