@@ -102,7 +102,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     private func dispatch(_ req: Request) async throws -> Response {
         guard let route = router.match(method: req.method, path: req.path) else {
             // Static fallback for unknown paths under /vendor/ or assets
-            if req.method == "GET" && (req.path.hasPrefix("/vendor/") || req.path.hasSuffix(".css") || req.path.hasSuffix(".js") || req.path.hasSuffix(".png") || req.path.hasSuffix(".svg") || req.path.hasSuffix(".ico")) {
+            if (req.method == "GET" || req.method == "HEAD") && (req.path.hasPrefix("/vendor/") || req.path.hasSuffix(".css") || req.path.hasSuffix(".js") || req.path.hasSuffix(".png") || req.path.hasSuffix(".svg") || req.path.hasSuffix(".ico") || req.path.hasSuffix(".wasm") || req.path.hasSuffix(".json") || req.path.hasSuffix(".txt") || req.path.hasSuffix(".onnx")) {
                 return try await serveStatic(req.path)
             }
             return .notFound()
@@ -128,7 +128,7 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         resp.headers["X-Content-Type-Options"] = "nosniff"
         resp.headers["Referrer-Policy"] = "no-referrer"
         resp.headers["X-Frame-Options"] = "DENY"
-        resp.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://ingress.us-west-2.aws.dash0.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        resp.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://ingress.us-west-2.aws.dash0.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
         resp.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         resp.headers["X-Robots-Tag"] = "noindex"
     }
@@ -166,6 +166,9 @@ public final class HTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         case "ico": mime = "image/x-icon"
         case "woff", "woff2": mime = "font/woff2"
         case "map": mime = "application/json"
+        case "wasm": mime = "application/wasm"
+        case "onnx": mime = "application/octet-stream"
+        case "txt": mime = "text/plain; charset=utf-8"
         default: mime = "application/octet-stream"
         }
         var buf = ByteBuffer()

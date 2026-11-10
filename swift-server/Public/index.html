@@ -7,6 +7,8 @@
 <meta name="description" content="Conference session search with accessibility filters, hybrid Elasticsearch, and a live agenda.">
 <link rel="stylesheet" href="/app.css">
 <script src="/app.js" defer></script>
+<script src="/experiments/webgpu-check.js" defer></script>
+<script src="/experiments/rerank.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#results">Skip to results</a>
@@ -123,6 +125,7 @@
       <p id="result-count" class="result-count"></p>
       <p id="interpreted" class="interpreted"></p>
       <p id="fallback-note" class="fallback-note" hidden></p>
+      <div id="rerank-slot"></div>
     </div>
 
     <div id="results" class="results" tabindex="-1"></div>

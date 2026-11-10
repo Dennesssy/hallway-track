@@ -40,7 +40,7 @@
     var flags = state.flags.slice();
     if (includeNeeds) {
       var needs = loadNeeds();
-      needs.flags.forEach(function (f) { if (flags.indexOf(f) === -1) flags.push(f); });
+      (needs.flags || []).forEach(function (f) { if (flags.indexOf(f) === -1) flags.push(f); });
       if (needs.level && !state.level) p.set("level", needs.level);
     }
     flags.forEach(function (f) { p.append("flags", f); });
@@ -73,7 +73,7 @@
     var needs = loadNeeds(), wrap = $("#needs-chips");
     if (!wrap) return;
     wrap.innerHTML = "";
-    needs.flags.forEach(function (f) {
+    (needs.flags || []).forEach(function (f) {
       var chip = document.createElement("span");
       chip.className = "need-chip";
       chip.textContent = needsFlagNames[f] || f;
@@ -194,6 +194,7 @@
       host.innerHTML = list.map(cardHTML).join("");
     }
     updateOps(data);
+    document.dispatchEvent(new CustomEvent("hallway:results", { detail: data }));
   }
 
   function renderError(msg) {
